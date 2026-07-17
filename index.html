@@ -1,28 +1,24 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Artora</title>
-    <link rel="stylesheet" href="style.css">
-</head>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
 
-<body>
+  <body>
+    <header>
+      <h1>🎨 Artora</h1>
 
-<header>
-
-    <h1>🎨 Artora</h1>
-
-    <nav>
-
+      <nav>
         <a href="#home">Home</a>
         <a href="#categories">Categories</a>
         <a href="#artists">Artists</a>
 
         <a href="cart.html" id="cartLink">
-            🛒 Cart
-            <span id="cartCount" class="cart-badge">0</span>
+          🛒 Cart
+          <span id="cartCount" class="cart-badge">0</span>
         </a>
 
         <a href="wishlist.html">❤️ Wishlist</a>
@@ -33,233 +29,186 @@
         <a href="#contact">Contact</a>
 
         <span id="userSection">
-            <a href="login.html" id="loginLink">👤 Login</a>
+          <a href="login.html" id="loginLink">👤 Login</a>
         </span>
+      </nav>
+    </header>
 
-    </nav>
-
-</header>
-
-<section id="home" class="hero">
-
-    <div class="hero-content">
-
+    <section id="home" class="hero">
+      <div class="hero-content">
         <h2>Discover Unique Handmade Arts</h2>
 
         <p>
-            Buy Paintings, Drawings, DIY Projects,
-            Handicrafts and Custom Arts directly from talented artists.
+          Buy Paintings, Drawings, DIY Projects, Handicrafts and Custom Arts
+          directly from talented artists.
         </p>
 
         <div class="search-box">
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="🔍 Search artworks or artists"
+          />
 
-            <input
-                type="text"
-                id="searchInput"
-                placeholder="🔍 Search artworks or artists">
-
-            <button id="searchBtn">
-                Search
-            </button>
-
+          <button id="searchBtn">Search</button>
         </div>
 
-        <br><br>
+        <br /><br />
 
-        <button id="exploreBtn">
-            Explore Collection
-        </button>
+        <button id="exploreBtn">Explore Collection</button>
+      </div>
+    </section>
 
-    </div>
+    <section id="categories" class="categories">
+      <h2>Browse Categories</h2>
 
-</section>
-
-<section id="categories" class="categories">
-
-    <h2>Browse Categories</h2>
-
-    <div class="cards">
-
+      <div class="cards">
         <div class="card">
+          🎨
 
-            🎨
+          <h3>Paintings</h3>
 
-            <h3>Paintings</h3>
-
-            <p>120+ Arts</p>
-
+          <p>120+ Arts</p>
         </div>
 
         <div class="card">
+          ✏️
 
-            ✏️
+          <h3>Drawings</h3>
 
-            <h3>Drawings</h3>
-
-            <p>85+ Arts</p>
-
+          <p>85+ Arts</p>
         </div>
 
         <div class="card">
+          🧵
 
-            🧵
+          <h3>Handicrafts</h3>
 
-            <h3>Handicrafts</h3>
-
-            <p>60+ Arts</p>
-
+          <p>60+ Arts</p>
         </div>
+      </div>
+    </section>
 
-    </div>
+    <section id="artists" class="featured">
+      <h2>Featured Artworks</h2>
 
-</section>
-
-<section id="artists" class="featured">
-
-    <h2>Featured Artworks</h2>
-
-    <div class="art-grid" id="artGrid">
-
+      <div class="art-grid" id="artGrid">
         <!-- Sunset -->
         <div class="art-card">
-            <img src="images/sunset.jpg" alt="Sunset Painting">
+          <img src="images/sunset.jpg" alt="Sunset Painting" />
 
-            <h3>Sunset Painting</h3>
+          <h3>Sunset Painting</h3>
 
-            <p>₹2,499</p>
+          <p>₹2,499</p>
 
-            <button class="wishlistBtn" data-id="1">
-    🤍 Wishlist
-</button>
+          <button class="wishlistBtn" data-id="1">🤍 Wishlist</button>
 
-            <button onclick="openDefaultArtwork(1)">
-                View Details
-            </button>
+          <button onclick="openDefaultArtwork(1)">View Details</button>
         </div>
 
         <!-- Bear -->
         <div class="art-card">
-            <img src="images/bear.jpg" alt="Bear Painting">
+          <img src="images/bear.jpg" alt="Bear Painting" />
 
-            <h3>Bear Painting</h3>
+          <h3>Bear Painting</h3>
 
-            <p>₹2,500</p>
+          <p>₹2,500</p>
 
-            <button class="wishlistBtn" data-id="2">
-    🤍 Wishlist
-</button>
+          <button class="wishlistBtn" data-id="2">🤍 Wishlist</button>
 
-            <button onclick="openDefaultArtwork(2)">
-                View Details
-            </button>
+          <button onclick="openDefaultArtwork(2)">View Details</button>
         </div>
 
         <!-- Bull -->
         <div class="art-card">
-            <img src="images/bull.jpg" alt="Bull Painting">
+          <img src="images/bull.jpg" alt="Bull Painting" />
 
-            <h3>Bull Painting</h3>
+          <h3>Bull Painting</h3>
 
-            <p>₹1,200</p>
+          <p>₹1,200</p>
 
-            <button class="wishlistBtn" data-id="3">
-                🤍 Wishlist
-            </button>
+          <button class="wishlistBtn" data-id="3">🤍 Wishlist</button>
 
-            <button onclick="openDefaultArtwork(3)">
-                View Details
-            </button>
+          <button onclick="openDefaultArtwork(3)">View Details</button>
         </div>
 
         <!-- Tiger -->
         <div class="art-card">
-            <img src="images/tiger.jpg" alt="Tiger Painting">
+          <img src="images/tiger.jpg" alt="Tiger Painting" />
 
-            <h3>Tiger Painting</h3>
+          <h3>Tiger Painting</h3>
 
-            <p>₹3,000</p>
+          <p>₹3,000</p>
 
-            <button class="wishlistBtn" data-id="4">
-                🤍 Wishlist
-            </button>
+          <button class="wishlistBtn" data-id="4">🤍 Wishlist</button>
 
-            <button onclick="openDefaultArtwork(4)">
-                View Details
-            </button>
+          <button onclick="openDefaultArtwork(4)">View Details</button>
         </div>
 
         <!-- Artist Uploaded Artworks will come automatically -->
+      </div>
+    </section>
 
-</div>
+    <section id="featured" class="featured">
+      <h2>Top Artists</h2>
 
-</section>
+      <div class="products">
+        <div class="product">
+          <h3>👨‍🎨 Rahul Arts</h3>
+          <p>⭐4.9 Rating</p>
+          <a href="artist-profile.html">
+            <button>View Profile</button>
+          </a>
+        </div>
 
-<section id="featured" class="featured">
+        <div class="product">
+          <h3>👩‍🎨 Priya Creations</h3>
+          <p>⭐4.8 Rating</p>
+          <a href="artist-profile.html">
+            <button>View Profile</button>
+          </a>
+        </div>
 
-<h2>Top Artists</h2>
+        <div class="product">
+          <h3>👨‍🎨 Kumar Crafts</h3>
+          <p>⭐4.7 Rating</p>
+          <a href="artist-profile.html">
+            <button>View Profile</button>
+          </a>
+        </div>
+      </div>
+    </section>
 
-<div class="products">
+    <section id="about" class="about">
+      <h2>About Artora</h2>
 
-<div class="product">
-<h3>👨‍🎨 Rahul Arts</h3>
-<p>⭐4.9 Rating</p>
-<a href="artist-profile.html">
-<button>View Profile</button>
-</a>
-</div>
+      <p>
+        Artora is a marketplace that connects talented artists with buyers. Our
+        mission is to help artists showcase and sell their creativity to the
+        world.
+      </p>
+    </section>
 
-<div class="product">
-<h3>👩‍🎨 Priya Creations</h3>
-<p>⭐4.8 Rating</p>
-<a href="artist-profile.html">
-<button>View Profile</button>
-</a>
-</div>
+    <section id="contact" class="contact">
+      <h2>Contact Us</h2>
 
-<div class="product">
-<h3>👨‍🎨 Kumar Crafts</h3>
-<p>⭐4.7 Rating</p>
-<a href="artist-profile.html">
-<button>View Profile</button>
-</a>
-</div>
+      <p>Email: support@artora.com</p>
 
-</div>
+      <p>Phone: +91 9342024380</p>
+    </section>
 
-</section>
+    <footer>
+      <h3>Artora</h3>
 
-<section id="about" class="about">
-<h2>About Artora</h2>
+      <p>Connecting Artists with Art Lovers.</p>
 
-<p>
-Artora is a marketplace that connects talented artists with buyers.
-Our mission is to help artists showcase and sell their creativity to the world.
-</p>
-</section>
+      <p>Email: support@artora.com</p>
 
-<section id="contact" class="contact">
-<h2>Contact Us</h2>
+      <p>Phone: +91 9876543210</p>
 
-<p>Email: support@artora.com</p>
+      <p>© 2026 Artora. All Rights Reserved.</p>
+    </footer>
 
-<p>Phone: +91 9342024380</p>
-</section>
-
-<footer>
-
-<h3>Artora</h3>
-
-<p>Connecting Artists with Art Lovers.</p>
-
-<p>Email: support@artora.com</p>
-
-<p>Phone: +91 9876543210</p>
-
-<p>© 2026 Artora. All Rights Reserved.</p>
-
-</footer>
-
-<script src="script.js"></script>
-
-</body>
+    <script src="js/script.js"></script>
+  </body>
 </html>
