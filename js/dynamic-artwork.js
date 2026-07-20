@@ -37,9 +37,9 @@ if (artwork) {
 
       localStorage.setItem("wishlist", JSON.stringify(wishlist));
 
-      alert("Added to Wishlist ❤️");
+      showToast("Added to Wishlist ❤️");
     } else {
-      alert("Already in Wishlist ❤️");
+      showToast("Already in Wishlist ❤️", "warning");
     }
   });
 
@@ -63,9 +63,9 @@ if (artwork) {
 
     localStorage.setItem("cartItems", JSON.stringify(cart));
 
-    alert("Added to Cart!");
+    showToast("Added to Cart! 🛒");
 
-    window.location.href = "cart.html";
+    updateCartBadge();
   });
 
   // ---------- Buy Now ----------
@@ -131,8 +131,7 @@ if (artwork && submitReview && reviewsList) {
     const rating = Number(document.getElementById("rating").value);
 
     if (text === "") {
-      alert("Write a review first!");
-
+      showToast("Please write a review first!", "warning");
       return;
     }
 
@@ -148,6 +147,6 @@ if (artwork && submitReview && reviewsList) {
 
     loadReviews();
 
-    alert("Review Submitted Successfully ⭐");
+    showToast("Review Submitted Successfully ⭐");
   });
 }

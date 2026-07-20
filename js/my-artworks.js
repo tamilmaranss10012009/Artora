@@ -37,7 +37,7 @@ if (artworks.length === 0) {
 function viewArtwork(index) {
   localStorage.setItem("selectedArtwork", JSON.stringify(artworks[index]));
 
-  window.location.href = "pages/dynamic-artwork.html";
+  window.location.href = "dynamic-artwork.html";
 }
 
 function editArtwork(index) {

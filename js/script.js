@@ -14,7 +14,7 @@ if (exploreBtn && featuredSection) {
 }
 
 // ==========================
-// Search
+// Search (Dynamic)
 // ==========================
 const searchBtn = document.getElementById("searchBtn");
 const searchInput = document.getElementById("searchInput");
@@ -22,18 +22,39 @@ const searchInput = document.getElementById("searchInput");
 if (searchBtn && searchInput) {
   searchBtn.addEventListener("click", function () {
     const text = searchInput.value.toLowerCase().trim();
-
-    if (text === "sunset") {
-      openDefaultArtwork(1);
-    } else if (text === "bear") {
-      openDefaultArtwork(2);
-    } else if (text === "bull") {
-      openDefaultArtwork(3);
-    } else if (text === "tiger") {
-      openDefaultArtwork(4);
-    } else {
-      alert("Artwork not found!");
+    if (!text) {
+      showToast("Please enter a search term", "warning");
+      return;
     }
+
+    // Search default artworks
+    for (const id in artworks) {
+      const art = artworks[id];
+      if (
+        art.title.toLowerCase().includes(text) ||
+        art.artist.toLowerCase().includes(text) ||
+        art.category.toLowerCase().includes(text)
+      ) {
+        openDefaultArtwork(id);
+        return;
+      }
+    }
+
+    // Search uploaded artworks
+    const uploaded = JSON.parse(localStorage.getItem("artistArtworks")) || [];
+    for (let i = 0; i < uploaded.length; i++) {
+      const art = uploaded[i];
+      if (
+        (art.title && art.title.toLowerCase().includes(text)) ||
+        (art.artist && art.artist.toLowerCase().includes(text)) ||
+        (art.category && art.category.toLowerCase().includes(text))
+      ) {
+        openDynamicArtwork(i);
+        return;
+      }
+    }
+
+    showToast("Artwork not found!", "error");
   });
 }
 
@@ -209,14 +230,14 @@ function addDynamicWishlist(index) {
 
   let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
 
-  const exists = wishlist.find((item) => item.title === artworks[id].title);
+  const exists = wishlist.find((item) => item.title === artwork.title);
 
   if (exists) {
     alert("Already in Wishlist ❤️");
     return;
   }
 
-  wishlist.push(artworks[id]);
+  wishlist.push(artwork);
 
   localStorage.setItem("wishlist", JSON.stringify(wishlist));
 

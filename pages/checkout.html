@@ -23,17 +23,32 @@
             <h2 id="checkoutTotal">Grand Total: ₹0</h2>
           </div>
           <form id="checkoutForm">
-            <input type="text" placeholder="Enter Your Name" required />
+            <input type="text" id="checkoutName" placeholder="Full Name" required />
 
-            <input type="tel" placeholder="Enter Mobile Number" required />
+            <input type="tel" id="checkoutPhone" placeholder="Mobile Number" required />
 
-            <textarea placeholder="Enter Delivery Address" required></textarea>
+            <input type="text" id="checkoutAddress" placeholder="Street Address" required />
+
+            <input type="text" id="checkoutCity" placeholder="City" required />
+
+            <input type="text" id="checkoutState" placeholder="State" required />
+
+            <input type="text" id="checkoutPincode" placeholder="Pincode" required />
+
+            <h3>Payment Method</h3>
+            <select id="paymentMethod" required>
+              <option value="">Select Payment Method</option>
+              <option value="COD">💵 Cash on Delivery</option>
+              <option value="UPI">📱 UPI Payment</option>
+              <option value="Card">💳 Card Payment</option>
+            </select>
 
             <button type="submit">Place Order</button>
           </form>
         </div>
       </div>
     </div>
+    <script src="../js/utils.js"></script>
     <script src="../js/checkout.js"></script>
   </body>
 </html>

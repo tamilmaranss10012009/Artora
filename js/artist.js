@@ -25,30 +25,35 @@ artistForm.addEventListener("submit", function (event) {
 
   let artworks = JSON.parse(localStorage.getItem("artistArtworks")) || [];
 
+  const currentUser = JSON.parse(localStorage.getItem("user"));
+  const artistName = currentUser ? currentUser.name : "Unknown Artist";
+
+  const category = document.getElementById("artCategory")?.value || "Painting";
+
   if (editIndex !== null) {
     artworks[editIndex] = {
       title,
       price,
       image,
       description,
-      artist: "Demo Artist",
-      category: "Painting",
+      artist: artistName,
+      category: category,
     };
 
     localStorage.removeItem("editIndex");
 
-    alert("Artwork Updated Successfully!");
+    showToast("Artwork Updated Successfully!");
   } else {
     artworks.push({
       title,
       price,
       image,
       description,
-      artist: "Demo Artist",
-      category: "Painting",
+      artist: artistName,
+      category: category,
     });
 
-    alert("Artwork Uploaded Successfully!");
+    showToast("Artwork Uploaded Successfully!");
   }
 
   localStorage.setItem("artistArtworks", JSON.stringify(artworks));

@@ -25,7 +25,14 @@
             <input
               type="password"
               id="signupPassword"
-              placeholder="Password"
+              placeholder="Password (min 6 characters)"
+              required
+            />
+
+            <input
+              type="password"
+              id="signupConfirm"
+              placeholder="Confirm Password"
               required
             />
 
@@ -42,6 +49,7 @@
       </div>
     </div>
 
+    <script src="../js/utils.js"></script>
     <script src="../js/auth.js"></script>
   </body>
 </html>
