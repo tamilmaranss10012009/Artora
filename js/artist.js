@@ -37,27 +37,23 @@ artistForm.addEventListener("submit", function (event) {
 
     localStorage.removeItem("editIndex");
 
-        alert("Artwork Updated Successfully!");
+    alert("Artwork Updated Successfully!");
+  } else {
+    artworks.push({
+      title,
+      price,
+      image,
+      description,
+      artist: "Demo Artist",
+      category: "Painting",
+    });
 
-    } else {
+    alert("Artwork Uploaded Successfully!");
+  }
 
-        artworks.push({
-    title,
-    price,
-    image,
-    description,
-    artist: "Demo Artist",
-    category: "Painting"
-});
+  localStorage.setItem("artistArtworks", JSON.stringify(artworks));
 
-        alert("Artwork Uploaded Successfully!");
+  artistForm.reset();
 
-    }
-
-    localStorage.setItem("artistArtworks", JSON.stringify(artworks));
-
-    artistForm.reset();
-
-    window.location.href = "my-artworks.html";
-
+  window.location.href = "my-artworks.html";
 });

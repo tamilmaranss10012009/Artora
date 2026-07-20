@@ -3,10 +3,10 @@ const wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
 const wishlistItems = document.getElementById("wishlistItems");
 
 if (wishlist.length > 0) {
-    wishlistItems.innerHTML = "";
+  wishlistItems.innerHTML = "";
 
   wishlist.forEach(function (item, index) {
-        wishlistItems.innerHTML += `
+    wishlistItems.innerHTML += `
             <div class="cart-item">
 
                 <img src="../${item.image}" class="cart-image">
@@ -15,13 +15,13 @@ if (wishlist.length > 0) {
 
                 <h3>${item.price}</h3>
 
-                <button onclick="moveToCart(${index})">
-    Move to Cart
-</button>
+    <button onclick="moveToCart(${index})">
+        Move to Cart
+    </button>
 
-<button onclick="removeWishlist(${index})">
-    Remove
-</button>
+    <button onclick="removeWishlist(${index})">
+        Remove
+    </button>
 
 </div>
 
@@ -29,41 +29,41 @@ if (wishlist.length > 0) {
 
             </div>
         `;
-    });
+  });
 } else {
-    wishlistItems.innerHTML = "<h2>Your Wishlist is Empty ❤️</h2>";
+  wishlistItems.innerHTML = "<h2>Your Wishlist is Empty ❤️</h2>";
 }
 
 function removeWishlist(index) {
-    let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+  let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
 
-    wishlist.splice(index, 1);
+  wishlist.splice(index, 1);
 
-    localStorage.setItem("wishlist", JSON.stringify(wishlist));
+  localStorage.setItem("wishlist", JSON.stringify(wishlist));
 
-    location.reload();
+  location.reload();
 }
 function moveToCart(index) {
-    let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
-    let cart = JSON.parse(localStorage.getItem("cartItems")) || [];
+  let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+  let cart = JSON.parse(localStorage.getItem("cartItems")) || [];
 
-    const item = wishlist[index];
+  const item = wishlist[index];
 
   const existing = cart.find((cartItem) => cartItem.title === item.title);
 
-    if (existing) {
-        existing.quantity += 1;
-    } else {
-        cart.push({
-            ...item,
+  if (existing) {
+    existing.quantity += 1;
+  } else {
+    cart.push({
+      ...item,
       quantity: 1,
-        });
-    }
+    });
+  }
 
-    wishlist.splice(index, 1);
+  wishlist.splice(index, 1);
 
-    localStorage.setItem("cartItems", JSON.stringify(cart));
-    localStorage.setItem("wishlist", JSON.stringify(wishlist));
+  localStorage.setItem("cartItems", JSON.stringify(cart));
+  localStorage.setItem("wishlist", JSON.stringify(wishlist));
 
-    location.reload();
+  location.reload();
 }

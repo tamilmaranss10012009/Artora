@@ -3,15 +3,13 @@ const items = JSON.parse(localStorage.getItem("cartItems")) || [];
 const cartItems = document.getElementById("cartItems");
 
 if (items.length > 0) {
-    let grandTotal = 0;
-    cartItems.innerHTML = "";
+  let grandTotal = 0;
+  cartItems.innerHTML = "";
 
-items.forEach(function(item, index) {
-const itemPrice = Number(
-    String(item.price).replace(/[₹,]/g, "")
-);
+  items.forEach(function (item, index) {
+    const itemPrice = Number(String(item.price).replace(/[₹,]/g, ""));
 
-grandTotal += itemPrice * item.quantity;
+    grandTotal += itemPrice * item.quantity;
     cartItems.innerHTML += `
         <div class="cart-item">
 
@@ -29,10 +27,9 @@ grandTotal += itemPrice * item.quantity;
     <button onclick="changeQuantity(${index}, 1)">+</button>
 </div>
 
-<p><strong>Total:</strong> ₹${
-(
-Number(String(item.price).replace(/[₹,]/g, "")) * item.quantity
-).toLocaleString("en-IN")}
+<p><strong>Total:</strong> ₹${(
+      Number(String(item.price).replace(/[₹,]/g, "")) * item.quantity
+    ).toLocaleString("en-IN")}
 </p>
 
 <button onclick="removeItem(${index})">Remove</button>
@@ -41,35 +38,32 @@ Number(String(item.price).replace(/[₹,]/g, "")) * item.quantity
 
         </div>
     `;
-
-});
-document.getElementById("grandTotal").innerText =
+  });
+  document.getElementById("grandTotal").innerText =
     "Grand Total: ₹" + grandTotal.toLocaleString("en-IN");
 } else {
-    cartItems.innerHTML = "<p>Your cart is empty.</p>";
-    document.getElementById("grandTotal").innerText = "Grand Total: ₹0";
+  cartItems.innerHTML = "<p>Your cart is empty.</p>";
+  document.getElementById("grandTotal").innerText = "Grand Total: ₹0";
 }
 function removeItem(index) {
+  let items = JSON.parse(localStorage.getItem("cartItems")) || [];
 
-    let items = JSON.parse(localStorage.getItem("cartItems")) || [];
+  items.splice(index, 1);
 
-    items.splice(index, 1);
+  localStorage.setItem("cartItems", JSON.stringify(items));
 
-    localStorage.setItem("cartItems", JSON.stringify(items));
-
-    location.reload();
+  location.reload();
 }
 function changeQuantity(index, change) {
+  let items = JSON.parse(localStorage.getItem("cartItems")) || [];
 
-    let items = JSON.parse(localStorage.getItem("cartItems")) || [];
+  items[index].quantity += change;
 
-    items[index].quantity += change;
+  if (items[index].quantity < 1) {
+    items[index].quantity = 1;
+  }
 
-    if (items[index].quantity < 1) {
-        items[index].quantity = 1;
-    }
+  localStorage.setItem("cartItems", JSON.stringify(items));
 
-    localStorage.setItem("cartItems", JSON.stringify(items));
-
-    location.reload();
+  location.reload();
 }

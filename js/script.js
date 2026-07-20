@@ -216,7 +216,7 @@ function addDynamicWishlist(index) {
     return;
   }
 
-wishlist.push(artworks[id]);
+  wishlist.push(artworks[id]);
 
   localStorage.setItem("wishlist", JSON.stringify(wishlist));
 

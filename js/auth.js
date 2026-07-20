@@ -3,65 +3,52 @@
 const signupForm = document.getElementById("signupForm");
 
 if (signupForm) {
+  signupForm.addEventListener("submit", function (event) {
+    event.preventDefault();
 
-    signupForm.addEventListener("submit", function(event) {
+    const name = document.getElementById("signupName").value.trim();
+    const email = document.getElementById("signupEmail").value.trim();
+    const password = document.getElementById("signupPassword").value.trim();
 
-        event.preventDefault();
+    const user = {
+      name,
+      email,
+      password,
+    };
 
-        const name = document.getElementById("signupName").value;
-        const email = document.getElementById("signupEmail").value;
-        const password = document.getElementById("signupPassword").value;
+    localStorage.setItem("user", JSON.stringify(user));
 
-        const user = {
-            name,
-            email,
-            password
-        };
+    alert("Signup Successful!");
 
-        localStorage.setItem("user", JSON.stringify(user));
-
-        alert("Signup Successful!");
-
-        window.location.href = "login.html";
-
-    });
-
+    window.location.href = "login.html";
+  });
 }
-
 
 // ---------- LOGIN ----------
 
 const loginForm = document.getElementById("loginForm");
 
 if (loginForm) {
+  loginForm.addEventListener("submit", function (event) {
+    event.preventDefault();
 
-    loginForm.addEventListener("submit", function(event) {
+    const email = document.getElementById("loginEmail").value;
+    const password = document.getElementById("loginPassword").value;
 
-        event.preventDefault();
+    const user = JSON.parse(localStorage.getItem("user"));
 
-        const email = document.getElementById("loginEmail").value;
-        const password = document.getElementById("loginPassword").value;
+    if (
+      user &&
+      email.toLowerCase() === user.email.toLowerCase() &&
+      password === user.password
+    ) {
+      localStorage.setItem("loggedIn", "true");
 
-        const user = JSON.parse(localStorage.getItem("user"));
+      alert("Login Successful!");
 
-        if (
-            user &&
-            email === user.email &&
-            password === user.password
-        ) {
-
-            localStorage.setItem("loggedIn", "true");
-
-            alert("Login Successful!");
-
-            window.location.href = "index.html";
-
-        } else {
-
-            alert("Invalid Email or Password");
-
-        }
-
-    });
-
+      window.location.href = "../index.html";
+    } else {
+      alert("Invalid Email or Password");
+    }
+  });
 }

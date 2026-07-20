@@ -1,47 +1,47 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Signup</title>
-    <link rel="stylesheet" href="../css/style.css">
-</head>
-<body>
-
-<div class="checkout-page">
-
-    <div class="checkout-card">
-
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
+  <body>
+    <div class="checkout-page">
+      <div class="checkout-card">
         <div class="checkout-info">
+          <h1>Create Account</h1>
 
-            <h1>Create Account</h1>
+          <form id="signupForm">
+            <input
+              type="text"
+              id="signupName"
+              placeholder="Full Name"
+              required
+            />
 
-            <form id="signupForm">
+            <input type="email" id="signupEmail" placeholder="Email" required />
 
-                <input type="text" id="signupName" placeholder="Full Name" required>
+            <input
+              type="password"
+              id="signupPassword"
+              placeholder="Password"
+              required
+            />
 
-                <input type="email" id="signupEmail" placeholder="Email" required>
+            <button type="submit">Signup</button>
+          </form>
 
-                <input type="password" id="signupPassword" placeholder="Password" required>
+          <br />
 
-                <button type="submit">Signup</button>
-
-            </form>
-
-            <br>
-
-            <p>
-                Already have an account?
-                <a href="login.html">Login</a>
-            </p>
-
+          <p>
+            Already have an account?
+            <a href="login.html">Login</a>
+          </p>
         </div>
-
+      </div>
     </div>
 
-</div>
-
-<script src="../js/auth.js"></script>
-
-</body>
+    <script src="../js/auth.js"></script>
+  </body>
 </html>

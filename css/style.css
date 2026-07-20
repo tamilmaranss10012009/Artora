@@ -1,3 +1,14 @@
+:root {
+  --primary-color: #5b3df5;
+  --primary-hover: #4b0082;
+  --secondary-color: #5b3df5;
+  --background: #f8f7ff;
+  --white: #ffffff;
+  --text-color: #333333;
+  --border-radius: 12px;
+  --shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -6,7 +17,8 @@
 }
 
 body {
-  background: linear-gradient(135deg, #f8f7ff, #ece8ff);
+  background: linear-gradient(135deg, var(--background), #ece8ff);
+  color: var(--text-color);
 }
 
 header {
@@ -14,23 +26,23 @@ header {
   justify-content: space-between;
   align-items: center;
   padding: 20px 80px;
-  background: white;
+  background: var(--white);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 header h1 {
-  color: #6a0dad;
+  color: var(--primary-color);
 }
 
 nav a {
   text-decoration: none;
-  color: #333;
+  color: var(--text-color);
   margin-left: 25px;
   font-weight: bold;
 }
 
 nav a:hover {
-  color: #6a0dad;
+  color: var(--primary-color);
 }
 
 .hero {
@@ -52,7 +64,7 @@ nav a:hover {
 button {
   margin-top: 35px;
   padding: 16px 40px;
-  background: #6a0dad;
+  background: var(--primary-color);
   color: white;
   border: none;
   border-radius: 10px;
@@ -61,7 +73,7 @@ button {
 }
 
 button:hover {
-  background: #4b0082;
+  background: var(--primary-hover);
 }
 .categories {
   padding: 60px 20px;
@@ -83,9 +95,9 @@ button:hover {
 .card {
   width: 180px;
   height: 180px;
-  background: white;
+  background: var(--white);
   border-radius: 15px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -97,18 +109,8 @@ button:hover {
 
 .card:hover {
   transform: translateY(-10px);
-  background: #6a0dad;
+  background: var(--primary-color);
   color: white;
-}
-.featured {
-  padding: 60px 20px;
-  text-align: center;
-  background: #f8f8f8;
-}
-
-.featured h2 {
-  font-size: 36px;
-  margin-bottom: 40px;
 }
 
 .products {
@@ -119,7 +121,7 @@ button:hover {
 }
 
 .product {
-  background: white;
+  background: var(--white);
   width: 220px;
   padding: 20px;
   border-radius: 12px;
@@ -132,7 +134,7 @@ button:hover {
 
 .product p {
   font-size: 18px;
-  color: #6a0dad;
+  color: var(--primary-color);
   font-weight: bold;
 }
 
@@ -195,10 +197,10 @@ button:hover {
 
 .art-card {
   width: 300px;
-  background: white;
+  background: var(--white);
   border-radius: 15px;
   overflow: hidden;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow);
   transition: 0.3s;
 }
 
@@ -219,7 +221,7 @@ button:hover {
 }
 
 .art-card button {
-  background: #6a0dad;
+  background: var(--primary-color);
   color: white;
   border: none;
   padding: 10px 20px;
@@ -280,8 +282,9 @@ button:hover {
 }
 
 .checkout-card {
-  width: 500px;
-  background: white;
+  width: 800px;
+  max-width: 95%;
+  background: var(--white);
   padding: 30px;
   border-radius: 15px;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
@@ -295,7 +298,7 @@ button:hover {
 }
 
 .checkout-info {
-  width: 350px;
+  width: 100%;
 }
 
 .checkout-info h1 {
@@ -399,11 +402,12 @@ button:hover {
   }
 }
 .cart-image {
-  width: 100%;
-  max-width: 350px;
-  height: auto;
-  display: block;
+  width: 180px;
+  height: 180px;
+  object-fit: cover;
   border-radius: 12px;
+  display: block;
+  margin-bottom: 15px;
 }
 .quantity-box {
   display: flex;
@@ -464,4 +468,45 @@ button:hover {
   position: absolute;
   top: -8px;
   right: -12px;
+}
+.cart-item {
+  padding: 20px;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 20px;
+}
+
+.cart-item h2 {
+  margin: 10px 0;
+}
+
+.cart-item h3 {
+  color: #5b3df5;
+  margin: 10px 0;
+}
+
+.cart-item button {
+  margin-right: 10px;
+  margin-top: 10px;
+}
+.cart-item {
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  margin-bottom: 25px;
+  text-align: center;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.wishlist-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 15px;
+  flex-wrap: wrap;
+}
+
+.wishlist-buttons button {
+  margin: 0;
 }

@@ -3,27 +3,24 @@ const orders = JSON.parse(localStorage.getItem("myOrders")) || [];
 const ordersList = document.getElementById("ordersList");
 
 if (orders.length > 0) {
+  ordersList.innerHTML = "";
 
-    ordersList.innerHTML = "";
+  orders.forEach(function (order, index) {
+    let total = 0;
 
-    orders.forEach(function(order, index) {
-
-        let total = 0;
-
-        let html = `
+    let html = `
             <div class="order-card">
                 <h2>Order #${index + 1}</h2>
 <p>${order.date}</p>
                 <hr><br>
         `;
 
-        order.items.forEach(function(item) {
+    order.items.forEach(function (item) {
+      const price = Number(item.price.replace(/[₹,]/g, ""));
 
-            const price = Number(item.price.replace(/[₹,]/g, ""));
+      total += price * item.quantity;
 
-            total += price * item.quantity;
-
-            html += `
+      html += `
                 <p>
                     <strong>${item.title}</strong><br>
                     Qty: ${item.quantity}<br>
@@ -31,20 +28,16 @@ if (orders.length > 0) {
                 </p>
                 <br>
             `;
-        });
+    });
 
-        html += `
+    html += `
             <h3>Total: ₹${order.total.toLocaleString("en-IN")}</h3>
             </div>
             <br>
         `;
 
-        ordersList.innerHTML += html;
-
-    });
-
+    ordersList.innerHTML += html;
+  });
 } else {
-
-    ordersList.innerHTML = "<h2>No Orders Yet</h2>";
-
+  ordersList.innerHTML = "<h2>No Orders Yet</h2>";
 }

@@ -3,8 +3,7 @@ const artwork = JSON.parse(localStorage.getItem("selectedArtwork"));
 const details = document.getElementById("artworkDetails");
 
 if (artwork) {
-
-    details.innerHTML = `
+  details.innerHTML = `
         <img src="${artwork.image}" class="cart-image">
 
         <h1>${artwork.title}</h1>
@@ -26,88 +25,74 @@ if (artwork) {
         <button id="buyNowBtn">⚡ Buy Now</button>
     `;
 
-    // ---------- Wishlist ----------
+  // ---------- Wishlist ----------
 
-    document.getElementById("wishlistBtn").addEventListener("click", function () {
+  document.getElementById("wishlistBtn").addEventListener("click", function () {
+    let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
 
-        let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+    const exists = wishlist.find((item) => item.title === artwork.title);
 
-        const exists = wishlist.find(item => item.title === artwork.title);
+    if (!exists) {
+      wishlist.push(artwork);
 
-        if (!exists) {
+      localStorage.setItem("wishlist", JSON.stringify(wishlist));
 
-            wishlist.push(artwork);
+      alert("Added to Wishlist ❤️");
+    } else {
+      alert("Already in Wishlist ❤️");
+    }
+  });
 
-            localStorage.setItem("wishlist", JSON.stringify(wishlist));
+  // ---------- Cart ----------
 
-            alert("Added to Wishlist ❤️");
+  document.getElementById("addCartBtn").addEventListener("click", function () {
+    let cart = JSON.parse(localStorage.getItem("cartItems")) || [];
 
-        } else {
+    const existing = cart.find((item) => item.title === artwork.title);
 
-            alert("Already in Wishlist ❤️");
+    if (existing) {
+      existing.quantity++;
+    } else {
+      cart.push({
+        title: artwork.title,
+        price: artwork.price,
+        image: artwork.image,
+        quantity: 1,
+      });
+    }
 
-        }
+    localStorage.setItem("cartItems", JSON.stringify(cart));
 
-    });
+    alert("Added to Cart!");
 
-    // ---------- Cart ----------
+    window.location.href = "cart.html";
+  });
 
-    document.getElementById("addCartBtn").addEventListener("click", function () {
+  // ---------- Buy Now ----------
 
-        let cart = JSON.parse(localStorage.getItem("cartItems")) || [];
+  document.getElementById("buyNowBtn").addEventListener("click", function () {
+    localStorage.setItem(
+      "cartItems",
+      JSON.stringify([
+        {
+          title: artwork.title,
+          price: artwork.price,
+          image: artwork.image,
+          quantity: 1,
+        },
+      ]),
+    );
 
-        const existing = cart.find(item => item.title === artwork.title);
-
-        if (existing) {
-
-            existing.quantity++;
-
-        } else {
-
-            cart.push({
-                title: artwork.title,
-                price: artwork.price,
-                image: artwork.image,
-                quantity: 1
-            });
-
-        }
-
-        localStorage.setItem("cartItems", JSON.stringify(cart));
-
-        alert("Added to Cart!");
-
-        window.location.href = "cart.html";
-
-    });
-
-    // ---------- Buy Now ----------
-
-    document.getElementById("buyNowBtn").addEventListener("click", function () {
-
-        localStorage.setItem("cartItems", JSON.stringify([
-            {
-                title: artwork.title,
-                price: artwork.price,
-                image: artwork.image,
-                quantity: 1
-            }
-        ]));
-
-        window.location.href = "checkout.html";
-
-    });
-
+    window.location.href = "checkout.html";
+  });
 } else {
-
-    details.innerHTML = `
+  details.innerHTML = `
 <h2>Artwork Not Found</h2>
 
-<a href="index.html" class="buy-btn">
+<a href="../index.html" class="buy-btn">
 ⬅ Back to Home
 </a>
 `;
-
 }
 
 // ---------- Reviews ----------
@@ -116,20 +101,17 @@ const reviewsList = document.getElementById("reviewsList");
 const submitReview = document.getElementById("submitReview");
 
 if (artwork && submitReview && reviewsList) {
+  let reviews = JSON.parse(localStorage.getItem("reviews")) || {};
 
-    let reviews = JSON.parse(localStorage.getItem("reviews")) || {};
+  if (!reviews[artwork.title]) {
+    reviews[artwork.title] = [];
+  }
 
-    if (!reviews[artwork.title]) {
-        reviews[artwork.title] = [];
-    }
+  function loadReviews() {
+    reviewsList.innerHTML = "";
 
-    function loadReviews() {
-
-        reviewsList.innerHTML = "";
-
-        reviews[artwork.title].forEach(function (review) {
-
-            reviewsList.innerHTML += `
+    reviews[artwork.title].forEach(function (review) {
+      reviewsList.innerHTML += `
                 <div class="art-card">
 
                     <h3>${"⭐".repeat(review.rating)}</h3>
@@ -138,43 +120,34 @@ if (artwork && submitReview && reviewsList) {
 
                 </div>
             `;
+    });
+  }
 
-        });
+  loadReviews();
 
+  submitReview.addEventListener("click", function () {
+    const text = document.getElementById("reviewText").value.trim();
+
+    const rating = Number(document.getElementById("rating").value);
+
+    if (text === "") {
+      alert("Write a review first!");
+
+      return;
     }
+
+    reviews[artwork.title].push({
+      rating: rating,
+
+      text: text,
+    });
+
+    localStorage.setItem("reviews", JSON.stringify(reviews));
+
+    document.getElementById("reviewText").value = "";
 
     loadReviews();
 
-    submitReview.addEventListener("click", function () {
-
-        const text = document.getElementById("reviewText").value.trim();
-
-        const rating = Number(document.getElementById("rating").value);
-
-        if (text === "") {
-
-            alert("Write a review first!");
-
-            return;
-
-        }
-
-        reviews[artwork.title].push({
-
-            rating: rating,
-
-            text: text
-
-        });
-
-        localStorage.setItem("reviews", JSON.stringify(reviews));
-
-        document.getElementById("reviewText").value = "";
-
-        loadReviews();
-
-        alert("Review Submitted Successfully ⭐");
-
-    });
-
+    alert("Review Submitted Successfully ⭐");
+  });
 }
