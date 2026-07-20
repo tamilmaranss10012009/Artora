@@ -3,15 +3,13 @@ const wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
 const wishlistItems = document.getElementById("wishlistItems");
 
 if (wishlist.length > 0) {
-
     wishlistItems.innerHTML = "";
 
-    wishlist.forEach(function(item, index) {
-
+  wishlist.forEach(function (item, index) {
         wishlistItems.innerHTML += `
             <div class="cart-item">
 
-                <img src="${item.image}" class="cart-image">
+                <img src="../${item.image}" class="cart-image">
 
                 <h2>${item.title}</h2>
 
@@ -25,21 +23,18 @@ if (wishlist.length > 0) {
     Remove
 </button>
 
+</div>
+
                 <hr><br>
 
             </div>
         `;
-
     });
-
 } else {
-
     wishlistItems.innerHTML = "<h2>Your Wishlist is Empty ❤️</h2>";
-
 }
 
 function removeWishlist(index) {
-
     let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
 
     wishlist.splice(index, 1);
@@ -47,23 +42,21 @@ function removeWishlist(index) {
     localStorage.setItem("wishlist", JSON.stringify(wishlist));
 
     location.reload();
-
 }
 function moveToCart(index) {
-
     let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
     let cart = JSON.parse(localStorage.getItem("cartItems")) || [];
 
     const item = wishlist[index];
 
-    const existing = cart.find(cartItem => cartItem.title === item.title);
+  const existing = cart.find((cartItem) => cartItem.title === item.title);
 
     if (existing) {
         existing.quantity += 1;
     } else {
         cart.push({
             ...item,
-            quantity: 1
+      quantity: 1,
         });
     }
 
@@ -73,5 +66,4 @@ function moveToCart(index) {
     localStorage.setItem("wishlist", JSON.stringify(wishlist));
 
     location.reload();
-
 }

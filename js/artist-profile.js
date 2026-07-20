@@ -11,33 +11,31 @@ const artworks = JSON.parse(localStorage.getItem("artistArtworks")) || [];
 
 const container = document.getElementById("artistArtworks");
 
-artworks.forEach((art, index) => {
+let html = "";
 
-container.innerHTML += `
+if (artworks.length === 0) {
+  container.innerHTML = "<p>No artworks uploaded yet.</p>";
+} else {
+  artworks.forEach((art, index) => {
+    html += `
 <div class="art-card">
 
-<img src="${art.image}" width="200">
+<img src="${art.image}" alt="${art.title}" class="art-image">
 
 <h3>${art.title}</h3>
 
 <p>${art.price}</p>
 
-<a href="#" onclick="viewArtwork(${index}); return false;">
-<button>View Details</button>
-</a>
+<button onclick="viewArtwork(${index})">
+View Details
+</button>
 
 </div>
 `;
-
-});
-
-function viewArtwork(index){
-
-localStorage.setItem(
-"selectedArtwork",
-JSON.stringify(artworks[index])
-);
-
-window.location.href="dynamic-artwork.html";
-
+  });
+  container.innerHTML = html;
+}
+function viewArtwork(index) {
+  localStorage.setItem("selectedArtwork", JSON.stringify(artworks[index]));
+  window.location.href = "dynamic-artwork.html";
 }

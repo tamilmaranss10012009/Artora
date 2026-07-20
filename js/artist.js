@@ -3,43 +3,39 @@ const editIndex = localStorage.getItem("editIndex");
 const artistForm = document.getElementById("artistForm");
 
 if (editIndex !== null) {
+  const artworks = JSON.parse(localStorage.getItem("artistArtworks")) || [];
 
-    const artworks = JSON.parse(localStorage.getItem("artistArtworks")) || [];
+  const art = artworks[editIndex];
 
-    const art = artworks[editIndex];
-
-    if (art) {
-        document.getElementById("artTitle").value = art.title;
-        document.getElementById("artPrice").value = art.price.replace("₹", "");
-        document.getElementById("artImage").value = art.image;
-        document.getElementById("artDesc").value = art.description;
-    }
-
+  if (art) {
+    document.getElementById("artTitle").value = art.title;
+    document.getElementById("artPrice").value = art.price.replace("₹", "");
+    document.getElementById("artImage").value = art.image;
+    document.getElementById("artDesc").value = art.description;
+  }
 }
 
-artistForm.addEventListener("submit", function(event) {
+artistForm.addEventListener("submit", function (event) {
+  event.preventDefault();
 
-    event.preventDefault();
+  const title = document.getElementById("artTitle").value.trim();
+  const price = "₹" + document.getElementById("artPrice").value.trim();
+  const image = document.getElementById("artImage").value.trim();
+  const description = document.getElementById("artDesc").value.trim();
 
-    const title = document.getElementById("artTitle").value;
-    const price = "₹" + document.getElementById("artPrice").value;
-    const image = document.getElementById("artImage").value;
-    const description = document.getElementById("artDesc").value;
+  let artworks = JSON.parse(localStorage.getItem("artistArtworks")) || [];
 
-    let artworks = JSON.parse(localStorage.getItem("artistArtworks")) || [];
+  if (editIndex !== null) {
+    artworks[editIndex] = {
+      title,
+      price,
+      image,
+      description,
+      artist: "Demo Artist",
+      category: "Painting",
+    };
 
-    if (editIndex !== null) {
-
-        artworks[editIndex] = {
-    title,
-    price,
-    image,
-    description,
-    artist: "Demo Artist",
-    category: "Painting"
-};
-
-        localStorage.removeItem("editIndex");
+    localStorage.removeItem("editIndex");
 
         alert("Artwork Updated Successfully!");
 

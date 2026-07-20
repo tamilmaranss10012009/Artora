@@ -89,7 +89,7 @@ const artworks = {
   1: {
     title: "Sunset Painting",
     price: "₹2,499",
-    image: "images/sunset.jpg",
+    image: "../images/sunset.jpg",
     description: "Beautiful Sunset Painting",
     artist: "Artora",
     category: "Painting",
@@ -98,7 +98,7 @@ const artworks = {
   2: {
     title: "Bear Painting",
     price: "₹2,500",
-    image: "images/bear.jpg",
+    image: "../images/bear.jpg",
     description: "Beautiful Bear Painting",
     artist: "Artora",
     category: "Painting",
@@ -107,7 +107,7 @@ const artworks = {
   3: {
     title: "Bull Painting",
     price: "₹1,200",
-    image: "images/bull.jpg",
+    image: "../images/bull.jpg",
     description: "Beautiful Bull Painting",
     artist: "Artora",
     category: "Painting",
@@ -116,7 +116,7 @@ const artworks = {
   4: {
     title: "Tiger Painting",
     price: "₹3,000",
-    image: "images/tiger.jpg",
+    image: "../images/tiger.jpg",
     description: "Beautiful Tiger Painting",
     artist: "Artora",
     category: "Painting",
@@ -193,7 +193,7 @@ function openDynamicArtwork(index) {
     "selectedArtwork",
     JSON.stringify(artistArtworks[index]),
   );
-  window.location.href = "dynamic-artwork.html";
+  window.location.href = "pages/dynamic-artwork.html";
 }
 
 // ==========================
@@ -209,14 +209,14 @@ function addDynamicWishlist(index) {
 
   let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
 
-  const exists = wishlist.find((item) => item.title === artwork.title);
+  const exists = wishlist.find((item) => item.title === artworks[id].title);
 
   if (exists) {
     alert("Already in Wishlist ❤️");
     return;
   }
 
-  wishlist.push(artwork);
+wishlist.push(artworks[id]);
 
   localStorage.setItem("wishlist", JSON.stringify(wishlist));
 
@@ -232,7 +232,7 @@ function openDefaultArtwork(id) {
 
   localStorage.setItem("selectedArtwork", JSON.stringify(artworks[id]));
 
-  window.location.href = "dynamic-artwork.html";
+  window.location.href = "pages/dynamic-artwork.html";
 }
 
 // ===== END OF PART 2 =====
