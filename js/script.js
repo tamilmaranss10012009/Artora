@@ -141,11 +141,13 @@ function loadArtworkRatings() {
     const ratingEl = document.getElementById(`rating-${id}`);
     if (ratingEl && reviews[art.title] && reviews[art.title].length > 0) {
       const ratings = reviews[art.title];
-      const avg = ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length;
+      const avg =
+        ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length;
       const fullStars = Math.round(avg);
       const starsStr = "★".repeat(fullStars) + "☆".repeat(5 - fullStars);
       ratingEl.querySelector(".stars-display").textContent = starsStr;
-      ratingEl.querySelector(".rating-score").textContent = `(${ratings.length})`;
+      ratingEl.querySelector(".rating-score").textContent =
+        `(${ratings.length})`;
     }
   }
 }

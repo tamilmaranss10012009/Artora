@@ -39,8 +39,10 @@ const cardSection = document.getElementById("cardSection");
 
 if (paymentSelect) {
   paymentSelect.addEventListener("change", function () {
-    if (upiSection) upiSection.style.display = this.value === "UPI" ? "block" : "none";
-    if (cardSection) cardSection.style.display = this.value === "Card" ? "block" : "none";
+    if (upiSection)
+      upiSection.style.display = this.value === "UPI" ? "block" : "none";
+    if (cardSection)
+      cardSection.style.display = this.value === "Card" ? "block" : "none";
   });
 }
 
@@ -67,34 +69,58 @@ function validateCheckout() {
   let valid = true;
 
   // Full Name: min 3 chars, letters and spaces only
-  valid = validateField("checkoutName", "nameError",
-    v => v.length >= 3 && /^[a-zA-Z\s]+$/.test(v),
-    "Full name must be at least 3 characters (letters only)") && valid;
+  valid =
+    validateField(
+      "checkoutName",
+      "nameError",
+      (v) => v.length >= 3 && /^[a-zA-Z\s]+$/.test(v),
+      "Full name must be at least 3 characters (letters only)",
+    ) && valid;
 
   // Phone: exactly 10 digits
-  valid = validateField("checkoutPhone", "phoneError",
-    v => /^[0-9]{10}$/.test(v),
-    "Phone must be exactly 10 digits") && valid;
+  valid =
+    validateField(
+      "checkoutPhone",
+      "phoneError",
+      (v) => /^[0-9]{10}$/.test(v),
+      "Phone must be exactly 10 digits",
+    ) && valid;
 
   // Address: min 10 characters
-  valid = validateField("checkoutAddress", "addressError",
-    v => v.length >= 10,
-    "Address must be at least 10 characters") && valid;
+  valid =
+    validateField(
+      "checkoutAddress",
+      "addressError",
+      (v) => v.length >= 10,
+      "Address must be at least 10 characters",
+    ) && valid;
 
   // City: min 2 characters
-  valid = validateField("checkoutCity", "cityError",
-    v => v.length >= 2 && /^[a-zA-Z\s]+$/.test(v),
-    "City must be at least 2 characters") && valid;
+  valid =
+    validateField(
+      "checkoutCity",
+      "cityError",
+      (v) => v.length >= 2 && /^[a-zA-Z\s]+$/.test(v),
+      "City must be at least 2 characters",
+    ) && valid;
 
   // State: min 2 characters
-  valid = validateField("checkoutState", "stateError",
-    v => v.length >= 2 && /^[a-zA-Z\s]+$/.test(v),
-    "State must be at least 2 characters") && valid;
+  valid =
+    validateField(
+      "checkoutState",
+      "stateError",
+      (v) => v.length >= 2 && /^[a-zA-Z\s]+$/.test(v),
+      "State must be at least 2 characters",
+    ) && valid;
 
   // Pincode: exactly 6 digits
-  valid = validateField("checkoutPincode", "pincodeError",
-    v => /^[0-9]{6}$/.test(v),
-    "Pincode must be exactly 6 digits") && valid;
+  valid =
+    validateField(
+      "checkoutPincode",
+      "pincodeError",
+      (v) => /^[0-9]{6}$/.test(v),
+      "Pincode must be exactly 6 digits",
+    ) && valid;
 
   // Payment method
   const payment = paymentSelect?.value;
@@ -106,24 +132,40 @@ function validateCheckout() {
 
   // UPI validation
   if (payment === "UPI") {
-    valid = validateField("upiId", "upiError",
-      v => /^[\w.\-_]+@[\w]+$/.test(v),
-      "Enter a valid UPI ID (e.g., name@upi)") && valid;
+    valid =
+      validateField(
+        "upiId",
+        "upiError",
+        (v) => /^[\w.\-_]+@[\w]+$/.test(v),
+        "Enter a valid UPI ID (e.g., name@upi)",
+      ) && valid;
   }
 
   // Card validation
   if (payment === "Card") {
-    valid = validateField("cardNumber", "cardNumberError",
-      v => /^[0-9]{16}$/.test(v.replace(/\s/g, "")),
-      "Card number must be 16 digits") && valid;
+    valid =
+      validateField(
+        "cardNumber",
+        "cardNumberError",
+        (v) => /^[0-9]{16}$/.test(v.replace(/\s/g, "")),
+        "Card number must be 16 digits",
+      ) && valid;
 
-    valid = validateField("cardExpiry", "cardExpiryError",
-      v => /^(0[1-9]|1[0-2])\/\d{2}$/.test(v),
-      "Expiry must be MM/YY") && valid;
+    valid =
+      validateField(
+        "cardExpiry",
+        "cardExpiryError",
+        (v) => /^(0[1-9]|1[0-2])\/\d{2}$/.test(v),
+        "Expiry must be MM/YY",
+      ) && valid;
 
-    valid = validateField("cardCvv", "cardCvvError",
-      v => /^[0-9]{3}$/.test(v),
-      "CVV must be 3 digits") && valid;
+    valid =
+      validateField(
+        "cardCvv",
+        "cardCvvError",
+        (v) => /^[0-9]{3}$/.test(v),
+        "CVV must be 3 digits",
+      ) && valid;
   }
 
   return valid;

@@ -36,7 +36,9 @@ artistForm.addEventListener("submit", function (event) {
 
   // Check for duplicate on new upload (not edit)
   if (editIndex === null) {
-    const duplicate = artworks.some(a => a.title.toLowerCase() === title.toLowerCase());
+    const duplicate = artworks.some(
+      (a) => a.title.toLowerCase() === title.toLowerCase(),
+    );
     if (duplicate) {
       showToast("An artwork with this title already exists!", "error");
       return;
