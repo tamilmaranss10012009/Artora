@@ -71,6 +71,16 @@ if (artwork) {
   // ---------- Buy Now ----------
 
   document.getElementById("buyNowBtn").addEventListener("click", function () {
+    // Require login before Buy Now
+    const loggedIn = localStorage.getItem("loggedIn") === "true";
+    if (!loggedIn) {
+      showToast("Please login to purchase", "warning");
+      setTimeout(() => {
+        window.location.href = "login.html";
+      }, 1000);
+      return;
+    }
+
     localStorage.setItem(
       "cartItems",
       JSON.stringify([

@@ -36,65 +36,16 @@ if (exploreBtn && featuredSection) {
 }
 
 // ==========================
-// Search (Dynamic)
-// ==========================
-const searchBtn = document.getElementById("searchBtn");
-const searchInput = document.getElementById("searchInput");
-
-if (searchBtn && searchInput) {
-  searchBtn.addEventListener("click", function () {
-    const text = searchInput.value.toLowerCase().trim();
-    if (!text) {
-      showToast("Please enter a search term", "warning");
-      return;
-    }
-
-    // Search default artworks
-    for (const id in artworks) {
-      const art = artworks[id];
-      if (
-        art.title.toLowerCase().includes(text) ||
-        art.artist.toLowerCase().includes(text) ||
-        art.category.toLowerCase().includes(text)
-      ) {
-        openDefaultArtwork(id);
-        return;
-      }
-    }
-
-    // Search uploaded artworks
-    const uploaded = JSON.parse(localStorage.getItem("artistArtworks")) || [];
-    for (let i = 0; i < uploaded.length; i++) {
-      const art = uploaded[i];
-      if (
-        (art.title && art.title.toLowerCase().includes(text)) ||
-        (art.artist && art.artist.toLowerCase().includes(text)) ||
-        (art.category && art.category.toLowerCase().includes(text))
-      ) {
-        openDynamicArtwork(i);
-        return;
-      }
-    }
-
-    showToast("Artwork not found!", "error");
-  });
-}
-
-// ==========================
 // Cart Badge
 // ==========================
 
 function updateCartCount() {
   const items = JSON.parse(localStorage.getItem("cartItems")) || [];
-
   let totalQty = 0;
-
   items.forEach((item) => {
     totalQty += item.quantity || 0;
   });
-
   const cartCount = document.getElementById("cartCount");
-
   if (cartCount) {
     cartCount.innerText = totalQty;
   }
@@ -103,253 +54,283 @@ function updateCartCount() {
 updateCartCount();
 
 // ==========================
-// Login Section
-// ==========================
-
-const user = JSON.parse(localStorage.getItem("user"));
-const loggedIn = localStorage.getItem("loggedIn");
-
-const userSection = document.getElementById("userSection");
-
-if (userSection && loggedIn === "true" && user) {
-  userSection.innerHTML = `
-        👋 ${user.name}
-        <button id="logoutBtn">Logout</button>
-    `;
-
-  document.getElementById("logoutBtn").addEventListener("click", function () {
-    localStorage.removeItem("loggedIn");
-    localStorage.removeItem("user");
-    localStorage.removeItem("cartItems");
-    localStorage.removeItem("wishlist");
-    localStorage.removeItem("myOrders");
-
-    showToast("Logged out successfully");
-    setTimeout(() => window.location.reload(), 500);
-  });
-}
-
-// ==========================
-// Load Ratings for Home Page
-// ==========================
-
-function loadArtworkRatings() {
-  const reviews = JSON.parse(localStorage.getItem("reviews")) || {};
-
-  for (const id in artworks) {
-    const art = artworks[id];
-    const ratingEl = document.getElementById(`rating-${id}`);
-    if (ratingEl && reviews[art.title] && reviews[art.title].length > 0) {
-      const ratings = reviews[art.title];
-      const avg =
-        ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length;
-      const fullStars = Math.round(avg);
-      const starsStr = "★".repeat(fullStars) + "☆".repeat(5 - fullStars);
-      ratingEl.querySelector(".stars-display").textContent = starsStr;
-      ratingEl.querySelector(".rating-score").textContent =
-        `(${ratings.length})`;
-    }
-  }
-}
-
-loadArtworkRatings();
-
-// ==========================
-// Default Artworks
+// Default Artworks Data
 // ==========================
 
 const artworks = {
   1: {
     title: "Sunset Painting",
     price: "₹2,499",
-    image: "../images/sunset.jpg",
+    image: "images/sunset.jpg",
     description: "Beautiful Sunset Painting",
     artist: "Artora",
     category: "Painting",
   },
-
   2: {
     title: "Bear Painting",
     price: "₹2,500",
-    image: "../images/bear.jpg",
+    image: "images/bear.jpg",
     description: "Beautiful Bear Painting",
     artist: "Artora",
     category: "Painting",
   },
-
   3: {
     title: "Bull Painting",
     price: "₹1,200",
-    image: "../images/bull.jpg",
+    image: "images/bull.jpg",
     description: "Beautiful Bull Painting",
     artist: "Artora",
     category: "Painting",
   },
-
   4: {
     title: "Tiger Painting",
     price: "₹3,000",
-    image: "../images/tiger.jpg",
+    image: "images/tiger.jpg",
     description: "Beautiful Tiger Painting",
     artist: "Artora",
     category: "Painting",
   },
 };
+
 // ==========================
-// Default Wishlist
+// Rating HTML Helper
 // ==========================
-const wishlistButtons = document.querySelectorAll(".wishlistBtn");
 
-wishlistButtons.forEach((button) => {
-  button.addEventListener("click", function (event) {
-    event.preventDefault();
+function getArtworkRatingHtml(title) {
+  const reviews = JSON.parse(localStorage.getItem("reviews")) || {};
+  if (reviews[title] && reviews[title].length > 0) {
+    const ratings = reviews[title];
+    const avg = ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length;
+    const fullStars = Math.round(avg);
+    const starsStr = "★".repeat(fullStars) + "☆".repeat(5 - fullStars);
+    return `<div class="art-rating"><span class="stars-display">${starsStr}</span> <span class="rating-score">(${ratings.length})</span></div>`;
+  }
+  return `<div class="art-rating"><span class="stars-display">★★★★★</span> <span class="rating-score">(0)</span></div>`;
+}
 
-    const id = this.dataset.id;
-    let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+// ==========================
+// Render All Artworks (with optional filter)
+// ==========================
 
-    const exists = wishlist.find((item) => item.title === artworks[id].title);
+function renderAllArtworks(filterText = "") {
+  const artGrid = document.getElementById("artGrid");
+  if (!artGrid) return;
 
-    if (!exists) {
-      wishlist.push(artworks[id]);
-      localStorage.setItem("wishlist", JSON.stringify(wishlist));
-      alert("Added to Wishlist ❤️");
-    } else {
-      alert("Already in Wishlist ❤️");
-    }
+  let html = "";
+
+  // Add default artworks
+  for (const id in artworks) {
+    const art = artworks[id];
+    const match =
+      !filterText ||
+      art.title.toLowerCase().includes(filterText) ||
+      art.artist.toLowerCase().includes(filterText) ||
+      art.category.toLowerCase().includes(filterText);
+
+    if (!match) continue;
+
+    const ratingHtml = getArtworkRatingHtml(art.title);
+    html += `
+      <div class="art-card">
+        <img src="${art.image}" alt="${art.title}" />
+        <h3>${art.title}</h3>
+        ${ratingHtml}
+        <p>${art.price}</p>
+        <button class="wishlistBtn" data-id="${id}">🤍 Wishlist</button>
+        <button onclick="openDefaultArtwork(${id})">View Details</button>
+      </div>
+    `;
+  }
+
+  // Add uploaded artworks
+  const uploaded = JSON.parse(localStorage.getItem("artistArtworks")) || [];
+  uploaded.forEach(function (art, index) {
+    const match =
+      !filterText ||
+      (art.title && art.title.toLowerCase().includes(filterText)) ||
+      (art.artist && art.artist.toLowerCase().includes(filterText)) ||
+      (art.category && art.category.toLowerCase().includes(filterText));
+
+    if (!match) return;
+
+    const ratingHtml = getArtworkRatingHtml(art.title);
+    html += `
+      <div class="art-card">
+        <img src="${art.image}" alt="${art.title}">
+        <h3>${art.title}</h3>
+        ${ratingHtml}
+        <p>${art.price}</p>
+        <button onclick="addDynamicWishlist(${index})">❤️ Wishlist</button>
+        <button onclick="openDynamicArtwork(${index})">View Details</button>
+      </div>
+    `;
   });
-});
 
-// ===== END OF PART 1 =====
-// ==========================
-// Artist Uploaded Artworks
-// ==========================
+  if (html === "") {
+    html = `<p style="grid-column:1/-1;text-align:center;padding:40px;font-size:18px;color:var(--text-color);">No artworks found${filterText ? ' matching "' + filterText + '"' : ''}.</p>`;
+  }
 
-const artistArtworks = JSON.parse(localStorage.getItem("artistArtworks")) || [];
-const artGrid = document.getElementById("artGrid");
+  artGrid.innerHTML = html;
 
-if (artGrid) {
-  artistArtworks.forEach(function (art, index) {
-    artGrid.innerHTML += `
-
-        <div class="art-card">
-
-            <img src="${art.image}" alt="${art.title}">
-
-            <h3>${art.title}</h3>
-  <p>${art.price}</p>
-
-            <button onclick="addDynamicWishlist(${index})">
-                ❤️ Wishlist
-            </button>
-
-            <button onclick="openDynamicArtwork(${index})">
-                View Details
-            </button>
-
-        </div>
-
-        `;
+  // Re-attach wishlist event listeners for default artworks
+  document.querySelectorAll(".wishlistBtn").forEach((button) => {
+    button.addEventListener("click", function (event) {
+      event.preventDefault();
+      const id = this.dataset.id;
+      let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+      const exists = wishlist.find((item) => item.title === artworks[id].title);
+      if (!exists) {
+        wishlist.push(artworks[id]);
+        localStorage.setItem("wishlist", JSON.stringify(wishlist));
+        showToast("Added to Wishlist ❤️");
+      } else {
+        showToast("Already in Wishlist ❤️", "warning");
+      }
+    });
   });
 }
 
 // ==========================
-// Category Filter
+// Search (Dynamic with full filtering)
+// ==========================
+
+const searchBtn = document.getElementById("searchBtn");
+const searchInput = document.getElementById("searchInput");
+
+if (searchBtn && searchInput) {
+  searchBtn.addEventListener("click", function () {
+    const text = searchInput.value.toLowerCase().trim();
+    if (!text) {
+      showToast("Please enter a search term", "warning");
+      renderAllArtworks("");
+      return;
+    }
+    renderAllArtworks(text);
+    showToast(`Showing results for "${text}"`, "info");
+  });
+
+  searchInput.addEventListener("keyup", function (e) {
+    if (e.key === "Enter") {
+      searchBtn.click();
+    }
+  });
+}
+
+// ==========================
+// Login Section (index.html)
+// ==========================
+
+function renderUserSection() {
+  const userSection = document.getElementById("userSection");
+  const currentUser = JSON.parse(localStorage.getItem("user"));
+  const isLoggedIn = localStorage.getItem("loggedIn") === "true";
+
+  if (!userSection) return;
+
+  if (isLoggedIn && currentUser) {
+    userSection.innerHTML = `
+      👋 ${currentUser.name}
+      <button id="logoutBtn">Logout</button>
+    `;
+
+    document.getElementById("logoutBtn").addEventListener("click", function () {
+      // Clear ALL session data
+      localStorage.removeItem("loggedIn");
+      localStorage.removeItem("user");
+      localStorage.removeItem("cartItems");
+      localStorage.removeItem("wishlist");
+      localStorage.removeItem("myOrders");
+      localStorage.removeItem("checkoutSession");
+
+      showToast("Logged out successfully");
+
+      // Immediately update UI without reload
+      renderUserSection();
+      updateCartCount();
+    });
+  } else {
+    userSection.innerHTML = `<a href="pages/login.html" id="loginLink">👤 Login</a>`;
+  }
+}
+
+renderUserSection();
+
+// ==========================
+// Business & Beauty Tips Buttons (Hero section)
+// ==========================
+
+// These are added after hero for quick access
+(function addUtilityButtons() {
+  const hero = document.querySelector(".hero-content");
+  if (!hero) return;
+  // Check if buttons already exist
+  if (document.getElementById("utilityButtons")) return;
+
+  const btnDiv = document.createElement("div");
+  btnDiv.id = "utilityButtons";
+  btnDiv.style.cssText = "display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:15px;";
+
+  btnDiv.innerHTML = `
+    <button onclick="window.open('https://blog.artora.com/business-tips', '_blank')" style="background:var(--primary-color); color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; font-size:14px;">💼 Business Tips</button>
+    <button onclick="window.open('https://blog.artora.com/beauty-tips', '_blank')" style="background:var(--primary-color); color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; font-size:14px;">✨ Beauty Tips</button>
+  `;
+
+  hero.appendChild(btnDiv);
+})();
+
+// ==========================
+// Category Filter (shows matching cards in grid)
 // ==========================
 
 function filterByCategory(category) {
-  // Search default artworks first
-  for (const id in artworks) {
-    const art = artworks[id];
-    if (art.category && art.category.toLowerCase() === category.toLowerCase()) {
-      openDefaultArtwork(id);
-      return;
-    }
+  renderAllArtworks(category.toLowerCase());
+
+  // Scroll to artworks section
+  const section = document.getElementById("artists");
+  if (section) {
+    section.scrollIntoView({ behavior: "smooth" });
   }
 
-  // Search uploaded artworks
-  const uploaded = JSON.parse(localStorage.getItem("artistArtworks")) || [];
-  for (let i = 0; i < uploaded.length; i++) {
-    const art = uploaded[i];
-    if (art.category && art.category.toLowerCase() === category.toLowerCase()) {
-      openDynamicArtwork(i);
-      return;
-    }
-  }
-
-  showToast(`No ${category} artworks found`, "info");
+  showToast(`Showing ${category} artworks`, "info");
 }
 
 // ==========================
-// Dynamic Artwork Details
-// ==========================
-
-function openDynamicArtwork(index) {
-  const artistArtworks =
-    JSON.parse(localStorage.getItem("artistArtworks")) || [];
-
-  if (!artistArtworks[index]) return;
-
-  localStorage.setItem(
-    "selectedArtwork",
-    JSON.stringify(artistArtworks[index]),
-  );
-  window.location.href = "pages/dynamic-artwork.html";
-}
-
-// ==========================
-// Dynamic Wishlist
-// ==========================
-
-function addDynamicWishlist(index) {
-  const artistArtworks =
-    JSON.parse(localStorage.getItem("artistArtworks")) || [];
-
-  const artwork = artistArtworks[index];
-  if (!artwork) return;
-
-  let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
-
-  const exists = wishlist.find((item) => item.title === artwork.title);
-
-  if (exists) {
-    alert("Already in Wishlist ❤️");
-    return;
-  }
-
-  wishlist.push(artwork);
-
-  localStorage.setItem("wishlist", JSON.stringify(wishlist));
-
-  alert("Added to Wishlist ❤️");
-}
-
-// ==========================
-// Default Artwork Details
+// Utility Functions
 // ==========================
 
 function openDefaultArtwork(id) {
   if (!artworks[id]) return;
-
   localStorage.setItem("selectedArtwork", JSON.stringify(artworks[id]));
-
   window.location.href = "pages/dynamic-artwork.html";
 }
 
-// ===== END OF PART 2 =====
-function testWishlist(button) {
-  const id = button.dataset.id;
+function openDynamicArtwork(index) {
+  const artistArtworks = JSON.parse(localStorage.getItem("artistArtworks")) || [];
+  if (!artistArtworks[index]) return;
+  localStorage.setItem("selectedArtwork", JSON.stringify(artistArtworks[index]));
+  window.location.href = "pages/dynamic-artwork.html";
+}
+
+function addDynamicWishlist(index) {
+  const artistArtworks = JSON.parse(localStorage.getItem("artistArtworks")) || [];
+  const artwork = artistArtworks[index];
+  if (!artwork) return;
 
   let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+  const exists = wishlist.find((item) => item.title === artwork.title);
 
-  const exists = wishlist.find((item) => item.title === artworks[id].title);
-
-  if (!exists) {
-    wishlist.push(artworks[id]);
-
-    localStorage.setItem("wishlist", JSON.stringify(wishlist));
-
-    alert("Added ❤️");
-  } else {
-    alert("Already ❤️");
+  if (exists) {
+    showToast("Already in Wishlist ❤️", "warning");
+    return;
   }
+
+  wishlist.push(artwork);
+  localStorage.setItem("wishlist", JSON.stringify(wishlist));
+  showToast("Added to Wishlist ❤️");
 }
+
+// ==========================
+// Initial Render - Show all artworks on page load
+// ==========================
+
+renderAllArtworks("");

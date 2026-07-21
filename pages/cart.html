@@ -23,7 +23,7 @@
 <h2 id="grandTotal">Grand Total: ₹0</h2>
 
 <div class="button-group">
-    <a href="checkout.html" class="buy-btn">
+    <a href="checkout.html" class="buy-btn" id="checkoutBuyBtn">
         Buy Now
     </a>
 
@@ -32,6 +32,19 @@
     </a>
 
 </div>
+
+<script>
+  // Require login before going to checkout
+  document.getElementById("checkoutBuyBtn")?.addEventListener("click", function(e) {
+    if (localStorage.getItem("loggedIn") !== "true") {
+      e.preventDefault();
+      showToast("Please login to checkout", "warning");
+      setTimeout(() => {
+        window.location.href = "login.html";
+      }, 1000);
+    }
+  });
+</script>
 
         </div>
 

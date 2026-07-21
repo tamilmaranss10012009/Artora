@@ -194,6 +194,11 @@ function injectNavbar() {
   if (logoutBtn) {
     logoutBtn.addEventListener("click", function () {
       localStorage.removeItem("loggedIn");
+      localStorage.removeItem("user");
+      localStorage.removeItem("cartItems");
+      localStorage.removeItem("wishlist");
+      localStorage.removeItem("myOrders");
+      localStorage.removeItem("checkoutSession");
       showToast("Logged out successfully");
       setTimeout(() => window.location.reload(), 500);
     });

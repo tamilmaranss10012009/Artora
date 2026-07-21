@@ -1,4 +1,19 @@
 // ==========================
+// Login Check - Require login before checkout
+// ==========================
+
+(function requireLogin() {
+  const loggedIn = localStorage.getItem("loggedIn") === "true";
+  if (!loggedIn) {
+    showToast("Please login to checkout", "warning");
+    setTimeout(() => {
+      window.location.href = "login.html";
+    }, 1000);
+    return;
+  }
+})();
+
+// ==========================
 // Order Summary
 // ==========================
 
@@ -153,6 +168,14 @@ function validateCheckout() {
 
     valid =
       validateField(
+        "cardHolderName",
+        "cardHolderNameError",
+        (v) => v.length >= 3 && /^[a-zA-Z\s]+$/.test(v),
+        "Card holder name must be at least 3 characters (letters only)",
+      ) && valid;
+
+    valid =
+      validateField(
         "cardExpiry",
         "cardExpiryError",
         (v) => /^(0[1-9]|1[0-2])\/\d{2}$/.test(v),
@@ -225,6 +248,15 @@ const form = document.getElementById("checkoutForm");
 if (form) {
   form.addEventListener("submit", function (event) {
     event.preventDefault();
+
+    // Double-check login
+    if (localStorage.getItem("loggedIn") !== "true") {
+      showToast("Please login to place an order", "error");
+      setTimeout(() => {
+        window.location.href = "login.html";
+      }, 1000);
+      return;
+    }
 
     if (items.length === 0) {
       showToast("Your cart is empty!", "error");
