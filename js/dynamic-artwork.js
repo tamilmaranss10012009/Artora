@@ -1,10 +1,20 @@
+// Normalize image path for pages/ subdirectory
+function normalizeImagePath(path) {
+  if (!path) return "";
+  if (path.startsWith("../") || path.startsWith("http://") || path.startsWith("https://") || path.startsWith("blob:")) {
+    return path;
+  }
+  return "../" + path;
+}
+
 const artwork = JSON.parse(localStorage.getItem("selectedArtwork"));
 
 const details = document.getElementById("artworkDetails");
 
 if (artwork) {
+  const imgPath = normalizeImagePath(artwork.image);
   details.innerHTML = `
-        <img src="${artwork.image}" class="cart-image">
+        <img src="${imgPath}" class="cart-image">
 
         <h1>${artwork.title}</h1>
 

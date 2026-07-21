@@ -191,20 +191,66 @@ function renderAllArtworks(filterText = "") {
 }
 
 // ==========================
-// Search (Dynamic with full filtering)
+// Search - Navigate directly to matching artwork
 // ==========================
 
 const searchBtn = document.getElementById("searchBtn");
 const searchInput = document.getElementById("searchInput");
 
+// Build a lookup map: lowercase title -> { id, type }
+function getArtworkLookup() {
+  const map = {};
+  for (const id in artworks) {
+    map[artworks[id].title.toLowerCase()] = { id: id, type: "default" };
+  }
+  const uploaded = JSON.parse(localStorage.getItem("artistArtworks")) || [];
+  uploaded.forEach((art, index) => {
+    if (art.title) {
+      map[art.title.toLowerCase()] = { index: index, type: "uploaded" };
+    }
+  });
+  return map;
+}
+
 if (searchBtn && searchInput) {
   searchBtn.addEventListener("click", function () {
-    const text = searchInput.value.toLowerCase().trim();
+    const rawText = searchInput.value.trim();
+    const text = rawText.toLowerCase().trim();
     if (!text) {
       showToast("Please enter a search term", "warning");
       renderAllArtworks("");
       return;
     }
+
+    const lookup = getArtworkLookup();
+
+    // Check for exact match first
+    if (lookup[text]) {
+      const match = lookup[text];
+      if (match.type === "default") {
+        openDefaultArtwork(match.id);
+      } else {
+        openDynamicArtwork(match.index);
+      }
+      searchInput.value = "";
+      return;
+    }
+
+    // Check if any artwork title starts with the search text
+    for (const title in lookup) {
+      if (title.startsWith(text)) {
+        const match = lookup[title];
+        if (match.type === "default") {
+          openDefaultArtwork(match.id);
+        } else {
+          openDynamicArtwork(match.index);
+        }
+        searchInput.value = "";
+        return;
+      }
+    }
+
+    // Fall back to filtered grid view
     renderAllArtworks(text);
     showToast(`Showing results for "${text}"`, "info");
   });
@@ -255,28 +301,6 @@ function renderUserSection() {
 
 renderUserSection();
 
-// ==========================
-// Business & Beauty Tips Buttons (Hero section)
-// ==========================
-
-// These are added after hero for quick access
-(function addUtilityButtons() {
-  const hero = document.querySelector(".hero-content");
-  if (!hero) return;
-  // Check if buttons already exist
-  if (document.getElementById("utilityButtons")) return;
-
-  const btnDiv = document.createElement("div");
-  btnDiv.id = "utilityButtons";
-  btnDiv.style.cssText = "display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:15px;";
-
-  btnDiv.innerHTML = `
-    <button onclick="window.open('https://blog.artora.com/business-tips', '_blank')" style="background:var(--primary-color); color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; font-size:14px;">💼 Business Tips</button>
-    <button onclick="window.open('https://blog.artora.com/beauty-tips', '_blank')" style="background:var(--primary-color); color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; font-size:14px;">✨ Beauty Tips</button>
-  `;
-
-  hero.appendChild(btnDiv);
-})();
 
 // ==========================
 // Category Filter (shows matching cards in grid)

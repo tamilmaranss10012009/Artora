@@ -1,3 +1,12 @@
+// Normalize image path for pages/ subdirectory: prepend ../ if path doesn't already start with ../
+function normalizeImagePath(path) {
+  if (!path) return "";
+  if (path.startsWith("../") || path.startsWith("http://") || path.startsWith("https://") || path.startsWith("blob:")) {
+    return path;
+  }
+  return "../" + path;
+}
+
 const items = JSON.parse(localStorage.getItem("cartItems")) || [];
 
 const cartItems = document.getElementById("cartItems");
@@ -8,12 +17,13 @@ if (items.length > 0) {
 
   items.forEach(function (item, index) {
     const itemPrice = Number(String(item.price).replace(/[₹,]/g, ""));
+    const imgPath = normalizeImagePath(item.image);
 
     grandTotal += itemPrice * item.quantity;
     cartItems.innerHTML += `
         <div class="cart-item">
 
-            <img src="${item.image}" class="cart-image">
+            <img src="${imgPath}" class="cart-image">
 
             <h2>${item.title}</h2>
 

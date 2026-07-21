@@ -79,6 +79,23 @@ if (loginForm) {
       localStorage.setItem("user", JSON.stringify(user));
       localStorage.setItem("loggedIn", "true");
 
+      // Restore user's saved data from per-user storage
+      const userKey = "userdata_" + user.email.toLowerCase();
+      const savedData = JSON.parse(localStorage.getItem(userKey)) || {};
+
+      if (savedData.cartItems) {
+        localStorage.setItem("cartItems", JSON.stringify(savedData.cartItems));
+      }
+      if (savedData.wishlist) {
+        localStorage.setItem("wishlist", JSON.stringify(savedData.wishlist));
+      }
+      if (savedData.myOrders) {
+        localStorage.setItem("myOrders", JSON.stringify(savedData.myOrders));
+      }
+      if (savedData.artistArtworks) {
+        localStorage.setItem("artistArtworks", JSON.stringify(savedData.artistArtworks));
+      }
+
       alert("Login Successful!");
 
       window.location.href = "../index.html";
