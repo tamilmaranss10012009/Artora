@@ -19,11 +19,29 @@ artistForm.addEventListener("submit", function (event) {
   event.preventDefault();
 
   const title = document.getElementById("artTitle").value.trim();
-  const price = "₹" + document.getElementById("artPrice").value.trim();
+  const priceVal = document.getElementById("artPrice").value.trim();
   const image = document.getElementById("artImage").value.trim();
   const description = document.getElementById("artDesc").value.trim();
 
+  // Reject negative or zero price
+  const numericPrice = Number(priceVal);
+  if (isNaN(numericPrice) || numericPrice <= 0) {
+    showToast("Price must be a positive number greater than 0!", "error");
+    return;
+  }
+
+  const price = "₹" + priceVal;
+
   let artworks = JSON.parse(localStorage.getItem("artistArtworks")) || [];
+
+  // Check for duplicate on new upload (not edit)
+  if (editIndex === null) {
+    const duplicate = artworks.some(a => a.title.toLowerCase() === title.toLowerCase());
+    if (duplicate) {
+      showToast("An artwork with this title already exists!", "error");
+      return;
+    }
+  }
 
   const currentUser = JSON.parse(localStorage.getItem("user"));
   const artistName = currentUser ? currentUser.name : "Unknown Artist";

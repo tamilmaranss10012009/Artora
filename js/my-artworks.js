@@ -43,7 +43,7 @@ function viewArtwork(index) {
 function editArtwork(index) {
   localStorage.setItem("editIndex", index);
 
-  window.location.href = "pages/artist.html";
+  window.location.href = "artist.html";
 }
 
 function deleteArtwork(index) {

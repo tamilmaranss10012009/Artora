@@ -33,12 +33,23 @@ if (signupForm) {
       return;
     }
 
+    // Check if email already exists
+    const existingUsers = JSON.parse(localStorage.getItem("allUsers")) || [];
+    const emailExists = existingUsers.some(u => u.email.toLowerCase() === email.toLowerCase());
+
+    if (emailExists) {
+      alert("Email already exists! Please use a different email or login.");
+      return;
+    }
+
     const user = {
       name,
       email,
       password: hashPassword(password),
     };
 
+    existingUsers.push(user);
+    localStorage.setItem("allUsers", JSON.stringify(existingUsers));
     localStorage.setItem("user", JSON.stringify(user));
 
     alert("Signup Successful!");
@@ -58,13 +69,14 @@ if (loginForm) {
     const email = document.getElementById("loginEmail").value;
     const password = document.getElementById("loginPassword").value;
 
-    const user = JSON.parse(localStorage.getItem("user"));
+    const allUsers = JSON.parse(localStorage.getItem("allUsers")) || [];
+    const user = allUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
 
     if (
       user &&
-      email.toLowerCase() === user.email.toLowerCase() &&
       hashPassword(password) === user.password
     ) {
+      localStorage.setItem("user", JSON.stringify(user));
       localStorage.setItem("loggedIn", "true");
 
       alert("Login Successful!");

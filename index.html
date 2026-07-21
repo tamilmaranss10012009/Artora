@@ -4,6 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Artora</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/style.css" />
   </head>
 
@@ -31,12 +34,14 @@
         <span id="userSection">
           <a href="pages/login.html" id="loginLink">👤 Login</a>
         </span>
+
+        <button id="themeToggle" class="theme-toggle-btn" aria-label="Toggle dark mode">🌙</button>
       </nav>
     </header>
 
     <section id="home" class="hero">
       <div class="hero-content">
-        <h2>Discover Unique Handmade Arts</h2>
+        <h2>Discover <span>Unique</span> Handmade Arts</h2>
 
         <p>
           Buy Paintings, Drawings, DIY Projects, Handicrafts and Custom Arts
@@ -63,7 +68,7 @@
       <h2>Browse Categories</h2>
 
       <div class="cards">
-        <div class="card">
+        <div class="card" onclick="filterByCategory('Painting')" style="cursor:pointer;">
           🎨
 
           <h3>Paintings</h3>
@@ -71,7 +76,7 @@
           <p>120+ Arts</p>
         </div>
 
-        <div class="card">
+        <div class="card" onclick="filterByCategory('Drawing')" style="cursor:pointer;">
           ✏️
 
           <h3>Drawings</h3>
@@ -79,7 +84,7 @@
           <p>85+ Arts</p>
         </div>
 
-        <div class="card">
+        <div class="card" onclick="filterByCategory('Handicraft')" style="cursor:pointer;">
           🧵
 
           <h3>Handicrafts</h3>
@@ -98,7 +103,10 @@
           <img src="images/sunset.jpg" alt="Sunset Painting" />
 
           <h3>Sunset Painting</h3>
-
+          <div class="art-rating" id="rating-1">
+            <span class="stars-display">★★★★★</span>
+            <span class="rating-score">(0)</span>
+          </div>
           <p>₹2,499</p>
 
           <button class="wishlistBtn" data-id="1">🤍 Wishlist</button>
@@ -111,7 +119,10 @@
           <img src="images/bear.jpg" alt="Bear Painting" />
 
           <h3>Bear Painting</h3>
-
+          <div class="art-rating" id="rating-2">
+            <span class="stars-display">★★★★★</span>
+            <span class="rating-score">(0)</span>
+          </div>
           <p>₹2,500</p>
 
           <button class="wishlistBtn" data-id="2">🤍 Wishlist</button>
@@ -124,7 +135,10 @@
           <img src="images/bull.jpg" alt="Bull Painting" />
 
           <h3>Bull Painting</h3>
-
+          <div class="art-rating" id="rating-3">
+            <span class="stars-display">★★★★★</span>
+            <span class="rating-score">(0)</span>
+          </div>
           <p>₹1,200</p>
 
           <button class="wishlistBtn" data-id="3">🤍 Wishlist</button>
@@ -137,7 +151,10 @@
           <img src="images/tiger.jpg" alt="Tiger Painting" />
 
           <h3>Tiger Painting</h3>
-
+          <div class="art-rating" id="rating-4">
+            <span class="stars-display">★★★★★</span>
+            <span class="rating-score">(0)</span>
+          </div>
           <p>₹3,000</p>
 
           <button class="wishlistBtn" data-id="4">🤍 Wishlist</button>
@@ -150,30 +167,48 @@
     </section>
 
     <section id="featured" class="featured">
-      <h2>Top Artists</h2>
+      <h2>⭐ Top Artists</h2>
 
       <div class="products">
-        <div class="product">
-          <h3>👨‍🎨 Rahul Arts</h3>
-          <p>⭐4.9 Rating</p>
+        <div class="product artist-card">
+          <div class="artist-avatar">🎨</div>
+          <h3>Rahul Arts</h3>
+          <div class="artist-rating">
+            <span class="stars">★★★★★</span>
+            <span class="rating-num">4.9</span>
+          </div>
+          <p class="artist-specialty">Oil Paintings • Landscapes</p>
+          <p class="artist-stats">🎨 47 Artworks • 1.2k Followers</p>
           <a href="pages/artist-profile.html">
-            <button>View Profile</button>
+            <button>👤 View Profile</button>
           </a>
         </div>
 
-        <div class="product">
-          <h3>👩‍🎨 Priya Creations</h3>
-          <p>⭐4.8 Rating</p>
+        <div class="product artist-card">
+          <div class="artist-avatar">🖌️</div>
+          <h3>Priya Creations</h3>
+          <div class="artist-rating">
+            <span class="stars">★★★★★</span>
+            <span class="rating-num">4.8</span>
+          </div>
+          <p class="artist-specialty">Watercolor • Portraits</p>
+          <p class="artist-stats">🎨 38 Artworks • 980 Followers</p>
           <a href="pages/artist-profile.html">
-            <button>View Profile</button>
+            <button>👤 View Profile</button>
           </a>
         </div>
 
-        <div class="product">
-          <h3>👨‍🎨 Kumar Crafts</h3>
-          <p>⭐4.7 Rating</p>
+        <div class="product artist-card">
+          <div class="artist-avatar">🧵</div>
+          <h3>Kumar Crafts</h3>
+          <div class="artist-rating">
+            <span class="stars">★★★★☆</span>
+            <span class="rating-num">4.7</span>
+          </div>
+          <p class="artist-specialty">Handicrafts • Woodwork</p>
+          <p class="artist-stats">🎨 62 Artworks • 750 Followers</p>
           <a href="pages/artist-profile.html">
-            <button>View Profile</button>
+            <button>👤 View Profile</button>
           </a>
         </div>
       </div>

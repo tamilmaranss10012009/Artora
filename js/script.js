@@ -1,4 +1,26 @@
 // ==========================
+// Dark Mode Toggle
+// ==========================
+
+(function initTheme() {
+  const savedTheme = localStorage.getItem("theme") || "light";
+  document.documentElement.setAttribute("data-theme", savedTheme);
+
+  const themeBtn = document.getElementById("themeToggle");
+  if (themeBtn) {
+    themeBtn.textContent = savedTheme === "dark" ? "☀️" : "🌙";
+
+    themeBtn.addEventListener("click", function () {
+      const current = document.documentElement.getAttribute("data-theme");
+      const next = current === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", next);
+      localStorage.setItem("theme", next);
+      this.textContent = next === "dark" ? "☀️" : "🌙";
+    });
+  }
+})();
+
+// ==========================
 // Explore Button
 // ==========================
 
@@ -97,10 +119,38 @@ if (userSection && loggedIn === "true" && user) {
 
   document.getElementById("logoutBtn").addEventListener("click", function () {
     localStorage.removeItem("loggedIn");
+    localStorage.removeItem("user");
+    localStorage.removeItem("cartItems");
+    localStorage.removeItem("wishlist");
+    localStorage.removeItem("myOrders");
 
-    window.location.reload();
+    showToast("Logged out successfully");
+    setTimeout(() => window.location.reload(), 500);
   });
 }
+
+// ==========================
+// Load Ratings for Home Page
+// ==========================
+
+function loadArtworkRatings() {
+  const reviews = JSON.parse(localStorage.getItem("reviews")) || {};
+
+  for (const id in artworks) {
+    const art = artworks[id];
+    const ratingEl = document.getElementById(`rating-${id}`);
+    if (ratingEl && reviews[art.title] && reviews[art.title].length > 0) {
+      const ratings = reviews[art.title];
+      const avg = ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length;
+      const fullStars = Math.round(avg);
+      const starsStr = "★".repeat(fullStars) + "☆".repeat(5 - fullStars);
+      ratingEl.querySelector(".stars-display").textContent = starsStr;
+      ratingEl.querySelector(".rating-score").textContent = `(${ratings.length})`;
+    }
+  }
+}
+
+loadArtworkRatings();
 
 // ==========================
 // Default Artworks
@@ -198,6 +248,33 @@ if (artGrid) {
 
         `;
   });
+}
+
+// ==========================
+// Category Filter
+// ==========================
+
+function filterByCategory(category) {
+  // Search default artworks first
+  for (const id in artworks) {
+    const art = artworks[id];
+    if (art.category && art.category.toLowerCase() === category.toLowerCase()) {
+      openDefaultArtwork(id);
+      return;
+    }
+  }
+
+  // Search uploaded artworks
+  const uploaded = JSON.parse(localStorage.getItem("artistArtworks")) || [];
+  for (let i = 0; i < uploaded.length; i++) {
+    const art = uploaded[i];
+    if (art.category && art.category.toLowerCase() === category.toLowerCase()) {
+      openDynamicArtwork(i);
+      return;
+    }
+  }
+
+  showToast(`No ${category} artworks found`, "info");
 }
 
 // ==========================

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Checkout</title>
+    <title>Checkout - Artora</title>
     <link rel="stylesheet" href="../css/style.css" />
   </head>
   <body>
@@ -14,28 +14,33 @@
 
           <div id="orderSummary">
             <h2>Order Summary</h2>
-
             <div id="summaryItems">Loading...</div>
-
-            <hr />
-            <br />
-
+            <hr /><br />
             <h2 id="checkoutTotal">Grand Total: ₹0</h2>
           </div>
-          <form id="checkoutForm">
-            <input type="text" id="checkoutName" placeholder="Full Name" required />
 
-            <input type="tel" id="checkoutPhone" placeholder="Mobile Number" required />
+          <form id="checkoutForm" novalidate>
+            <h3>Shipping Details</h3>
 
-            <input type="text" id="checkoutAddress" placeholder="Street Address" required />
+            <input type="text" id="checkoutName" placeholder="Full Name (min 3 characters)" required />
+            <span class="field-error" id="nameError"></span>
 
-            <input type="text" id="checkoutCity" placeholder="City" required />
+            <input type="tel" id="checkoutPhone" placeholder="Mobile Number (10 digits)" required />
+            <span class="field-error" id="phoneError"></span>
 
-            <input type="text" id="checkoutState" placeholder="State" required />
+            <input type="text" id="checkoutAddress" placeholder="Street Address (min 10 characters)" required />
+            <span class="field-error" id="addressError"></span>
 
-            <input type="text" id="checkoutPincode" placeholder="Pincode" required />
+            <input type="text" id="checkoutCity" placeholder="City (min 2 characters)" required />
+            <span class="field-error" id="cityError"></span>
 
-            <h3>Payment Method</h3>
+            <input type="text" id="checkoutState" placeholder="State (min 2 characters)" required />
+            <span class="field-error" id="stateError"></span>
+
+            <input type="text" id="checkoutPincode" placeholder="Pincode (6 digits)" required />
+            <span class="field-error" id="pincodeError"></span>
+
+            <h3>💳 Payment Method</h3>
             <select id="paymentMethod" required>
               <option value="">Select Payment Method</option>
               <option value="COD">💵 Cash on Delivery</option>
@@ -43,7 +48,39 @@
               <option value="Card">💳 Card Payment</option>
             </select>
 
-            <button type="submit">Place Order</button>
+            <!-- UPI Section -->
+            <div id="upiSection" class="payment-section" style="display:none;">
+              <h4>📱 UPI Payment</h4>
+              <input type="text" id="upiId" placeholder="UPI ID (e.g., name@upi)" />
+              <span class="field-error" id="upiError"></span>
+              <div class="payment-icons">
+                <span class="payment-icon" title="Google Pay">📱 GPay</span>
+                <span class="payment-icon" title="PhonePe">📱 PhonePe</span>
+                <span class="payment-icon" title="Paytm">📱 Paytm</span>
+                <span class="payment-icon" title="BHIM">📱 BHIM</span>
+              </div>
+            </div>
+
+            <!-- Card Section -->
+            <div id="cardSection" class="payment-section" style="display:none;">
+              <h4>💳 Card Payment</h4>
+              <input type="text" id="cardNumber" placeholder="Card Number (16 digits)" maxlength="19" />
+              <span class="field-error" id="cardNumberError"></span>
+              <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <input type="text" id="cardExpiry" placeholder="MM/YY" maxlength="5" style="flex:1; min-width:120px;" />
+                <input type="text" id="cardCvv" placeholder="CVV (3 digits)" maxlength="3" style="flex:1; min-width:100px;" />
+              </div>
+              <span class="field-error" id="cardExpiryError"></span>
+              <span class="field-error" id="cardCvvError"></span>
+              <div class="payment-icons">
+                <span class="payment-icon" title="Visa">💳 Visa</span>
+                <span class="payment-icon" title="Mastercard">💳 Mastercard</span>
+                <span class="payment-icon" title="RuPay">💳 RuPay</span>
+                <span class="payment-icon" title="Amex">💳 Amex</span>
+              </div>
+            </div>
+
+            <button type="submit" id="placeOrderBtn">Place Order</button>
           </form>
         </div>
       </div>
