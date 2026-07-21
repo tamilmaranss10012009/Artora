@@ -6,8 +6,7 @@ if (wishlist.length > 0) {
   wishlistItems.innerHTML = "";
 
   wishlist.forEach(function (item, index) {
-    // Normalize image path: if it already starts with ../, don't add another ../
-    const imgPath = item.image.startsWith("../") ? item.image : "../" + item.image;
+    const imgPath = normalizeImagePath(item.image);
     wishlistItems.innerHTML += `
             <div class="cart-item">
 

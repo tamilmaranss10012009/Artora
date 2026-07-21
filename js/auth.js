@@ -52,6 +52,15 @@ if (signupForm) {
     localStorage.setItem("allUsers", JSON.stringify(existingUsers));
     localStorage.setItem("user", JSON.stringify(user));
 
+    // Initialize per-user storage with empty data to prevent stale session leaks
+    const userKey = "userdata_" + email.toLowerCase();
+    localStorage.setItem(userKey, JSON.stringify({
+      cartItems: [],
+      wishlist: [],
+      myOrders: [],
+      artistArtworks: []
+    }));
+
     alert("Signup Successful!");
 
     window.location.href = "login.html";

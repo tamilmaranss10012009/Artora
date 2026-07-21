@@ -1,12 +1,3 @@
-// Normalize image path for pages/ subdirectory
-function normalizeImagePath(path) {
-  if (!path) return "";
-  if (path.startsWith("../") || path.startsWith("http://") || path.startsWith("https://") || path.startsWith("blob:")) {
-    return path;
-  }
-  return "../" + path;
-}
-
 const artwork = JSON.parse(localStorage.getItem("selectedArtwork"));
 
 const details = document.getElementById("artworkDetails");

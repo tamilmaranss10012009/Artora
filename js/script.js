@@ -280,26 +280,45 @@ function renderUserSection() {
     `;
 
     document.getElementById("logoutBtn").addEventListener("click", function () {
-      // Clear ALL session data
-      localStorage.removeItem("loggedIn");
-      localStorage.removeItem("user");
-      localStorage.removeItem("cartItems");
-      localStorage.removeItem("wishlist");
-      localStorage.removeItem("myOrders");
-      localStorage.removeItem("checkoutSession");
-
-      showToast("Logged out successfully");
-
-      // Immediately update UI without reload
-      renderUserSection();
-      updateCartCount();
+      logoutUser();
     });
   } else {
     userSection.innerHTML = `<a href="pages/login.html" id="loginLink">👤 Login</a>`;
   }
 }
 
+// Conditionally show/hide protected nav links on index.html
+function updateProtectedNavLinks() {
+  const isLoggedIn = localStorage.getItem("loggedIn") === "true";
+  const nav = document.querySelector("header nav");
+  if (!nav) return;
+
+  // Remove existing protected links if any (from previous renders)
+  const existingLinks = nav.querySelectorAll(".protected-nav-link");
+  existingLinks.forEach(el => el.remove());
+
+  if (isLoggedIn) {
+    // Add cart, wishlist, orders, my-artworks after the Artists link
+    const artistsLink = nav.querySelector('a[href="#artists"]');
+    if (artistsLink) {
+      const linksHtml = `
+        <a href="pages/cart.html" id="cartLink" class="protected-nav-link">
+          🛒 Cart
+          <span id="cartCount" class="cart-badge">0</span>
+        </a>
+        <a href="pages/wishlist.html" class="protected-nav-link">❤️ Wishlist</a>
+        <a href="pages/orders.html" class="protected-nav-link">📦 My Orders</a>
+        <a href="pages/my-artworks.html" class="protected-nav-link">🎨 My Artworks</a>
+      `;
+      artistsLink.insertAdjacentHTML("afterend", linksHtml);
+    }
+  }
+
+  updateCartCount();
+}
+
 renderUserSection();
+updateProtectedNavLinks();
 
 
 // ==========================

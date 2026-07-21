@@ -6,10 +6,11 @@ if (artworks.length === 0) {
   container.innerHTML = "<h2>No Artworks Uploaded Yet</h2>";
 } else {
   artworks.forEach((art, index) => {
+    const imgPath = normalizeImagePath(art.image);
     container.innerHTML += `
             <div class="art-card">
 
-                <img src="${art.image}" width="200">
+                <img src="${imgPath}" width="200">
 
                 <h3>${art.title}</h3>
 

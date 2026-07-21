@@ -1,12 +1,3 @@
-// Normalize image path for pages/ subdirectory: prepend ../ if path doesn't already start with ../
-function normalizeImagePath(path) {
-  if (!path) return "";
-  if (path.startsWith("../") || path.startsWith("http://") || path.startsWith("https://") || path.startsWith("blob:")) {
-    return path;
-  }
-  return "../" + path;
-}
-
 const items = JSON.parse(localStorage.getItem("cartItems")) || [];
 
 const cartItems = document.getElementById("cartItems");

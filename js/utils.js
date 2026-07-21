@@ -77,6 +77,16 @@ function showToast(message, type = "success", duration = 3000) {
   }
 })();
 
+// ---------- Image Path Normalization ----------
+// Normalize image path for pages/ subdirectory: prepend ../ if path doesn't already start with ../
+function normalizeImagePath(path) {
+  if (!path) return "";
+  if (path.startsWith("../") || path.startsWith("http://") || path.startsWith("https://") || path.startsWith("blob:")) {
+    return path;
+  }
+  return "../" + path;
+}
+
 // ---------- LocalStorage Helpers ----------
 function getStorage(key, defaultValue = null) {
   try {
@@ -124,6 +134,50 @@ function getCurrentUser() {
   return getStorage("user");
 }
 
+// Get the per-user storage key
+function getUserDataKey() {
+  const user = getCurrentUser();
+  if (!user || !user.email) return null;
+  return "userdata_" + user.email.toLowerCase();
+}
+
+// ---------- Save current user data to per-user storage ----------
+function saveUserData() {
+  const key = getUserDataKey();
+  if (!key) return;
+
+  const userData = {
+    cartItems: getStorage("cartItems", []),
+    wishlist: getStorage("wishlist", []),
+    myOrders: getStorage("myOrders", []),
+    artistArtworks: getStorage("artistArtworks", []),
+  };
+
+  localStorage.setItem(key, JSON.stringify(userData));
+}
+
+// ---------- Logout: save user data, then clear only active session ----------
+function logoutUser() {
+  // Save current user's data before clearing
+  saveUserData();
+
+  // Clear only the active session (not permanent data)
+  localStorage.removeItem("loggedIn");
+  localStorage.removeItem("user");
+  localStorage.removeItem("cartItems");
+  localStorage.removeItem("wishlist");
+  localStorage.removeItem("myOrders");
+  localStorage.removeItem("artistArtworks");
+  localStorage.removeItem("checkoutSession");
+  localStorage.removeItem("selectedArtwork");
+  localStorage.removeItem("editIndex");
+
+  showToast("Logged out successfully");
+
+  // Reload page or refresh UI
+  setTimeout(() => window.location.reload(), 500);
+}
+
 // ---------- Cart Badge Update ----------
 function updateCartBadge() {
   const items = getStorage("cartItems", []);
@@ -147,6 +201,17 @@ function injectNavbar() {
   const isInPages = window.location.pathname.includes("/pages/");
   const p = isInPages ? "../" : "";
 
+  // Conditionally show protected links only when logged in
+  const protectedLinks = loggedIn ? `
+    <a href="${p}cart.html" id="cartLink">
+      🛒 Cart
+      <span id="cartCount" class="cart-badge">0</span>
+    </a>
+    <a href="${p}wishlist.html">❤️ Wishlist</a>
+    <a href="${p}orders.html">📦 My Orders</a>
+    <a href="${p}my-artworks.html">🎨 My Artworks</a>
+  ` : '';
+
   header.innerHTML = `
     <h1>🎨 <a href="${p}index.html" style="text-decoration:none;color:inherit;">Artora</a></h1>
     <button class="hamburger" id="hamburgerBtn" aria-label="Toggle menu">
@@ -156,19 +221,13 @@ function injectNavbar() {
       <a href="${p}index.html">Home</a>
       <a href="${p}index.html#categories">Categories</a>
       <a href="${p}index.html#artists">Artists</a>
-      <a href="${p}pages/cart.html" id="cartLink">
-        🛒 Cart
-        <span id="cartCount" class="cart-badge">0</span>
-      </a>
-      <a href="${p}pages/wishlist.html">❤️ Wishlist</a>
-      <a href="${p}pages/orders.html">📦 My Orders</a>
-      <a href="${p}pages/my-artworks.html">🎨 My Artworks</a>
+      ${protectedLinks}
       <button id="themeToggle" class="theme-toggle-btn" aria-label="Toggle dark mode">🌙</button>
       <span id="userSection">
         ${
           loggedIn && user
             ? `👋 ${user.name} <button id="logoutBtn" class="nav-logout-btn">Logout</button>`
-            : `<a href="${p}pages/login.html">👤 Login</a>`
+            : `<a href="${p}login.html">👤 Login</a>`
         }
       </span>
     </nav>
@@ -189,18 +248,11 @@ function injectNavbar() {
   // Cart badge
   updateCartBadge();
 
-  // Logout handler
+  // Logout handler — uses centralized logoutUser
   const logoutBtn = document.getElementById("logoutBtn");
   if (logoutBtn) {
     logoutBtn.addEventListener("click", function () {
-      localStorage.removeItem("loggedIn");
-      localStorage.removeItem("user");
-      localStorage.removeItem("cartItems");
-      localStorage.removeItem("wishlist");
-      localStorage.removeItem("myOrders");
-      localStorage.removeItem("checkoutSession");
-      showToast("Logged out successfully");
-      setTimeout(() => window.location.reload(), 500);
+      logoutUser();
     });
   }
 
