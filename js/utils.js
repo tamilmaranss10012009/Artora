@@ -199,35 +199,37 @@ function injectNavbar() {
 
   // Detect if we're in pages/ subdirectory
   const isInPages = window.location.pathname.includes("/pages/");
-  const p = isInPages ? "../" : "";
+  // From pages/, links to index need ../ prefix; links within pages/ need no prefix
+  const toRoot = isInPages ? "../" : "";
+  const toPages = isInPages ? "" : "pages/";
 
   // Conditionally show protected links only when logged in
   const protectedLinks = loggedIn ? `
-    <a href="${p}cart.html" id="cartLink">
+    <a href="${toPages}cart.html" id="cartLink">
       🛒 Cart
       <span id="cartCount" class="cart-badge">0</span>
     </a>
-    <a href="${p}wishlist.html">❤️ Wishlist</a>
-    <a href="${p}orders.html">📦 My Orders</a>
-    <a href="${p}my-artworks.html">🎨 My Artworks</a>
+    <a href="${toPages}wishlist.html">❤️ Wishlist</a>
+    <a href="${toPages}orders.html">📦 My Orders</a>
+    <a href="${toPages}my-artworks.html">🎨 My Artworks</a>
   ` : '';
 
   header.innerHTML = `
-    <h1>🎨 <a href="${p}index.html" style="text-decoration:none;color:inherit;">Artora</a></h1>
+    <h1>🎨 <a href="${toRoot}index.html" style="text-decoration:none;color:inherit;">Artora</a></h1>
     <button class="hamburger" id="hamburgerBtn" aria-label="Toggle menu">
       <span></span><span></span><span></span>
     </button>
     <nav id="mainNav">
-      <a href="${p}index.html">Home</a>
-      <a href="${p}index.html#categories">Categories</a>
-      <a href="${p}index.html#artists">Artists</a>
+      <a href="${toRoot}index.html">Home</a>
+      <a href="${toRoot}index.html#categories">Categories</a>
+      <a href="${toRoot}index.html#artists">Artists</a>
       ${protectedLinks}
       <button id="themeToggle" class="theme-toggle-btn" aria-label="Toggle dark mode">🌙</button>
       <span id="userSection">
         ${
           loggedIn && user
             ? `👋 ${user.name} <button id="logoutBtn" class="nav-logout-btn">Logout</button>`
-            : `<a href="${p}login.html">👤 Login</a>`
+            : `<a href="${toPages}login.html">👤 Login</a>`
         }
       </span>
     </nav>
