@@ -24,12 +24,12 @@ if (signupForm) {
     const confirm = document.getElementById("signupConfirm")?.value.trim();
 
     if (confirm && password !== confirm) {
-      alert("Passwords do not match!");
+      showToast("Passwords do not match!", "error");
       return;
     }
 
     if (password.length < 6) {
-      alert("Password must be at least 6 characters long!");
+      showToast("Password must be at least 6 characters long!", "error");
       return;
     }
 
@@ -38,7 +38,7 @@ if (signupForm) {
     const emailExists = existingUsers.some(u => u.email.toLowerCase() === email.toLowerCase());
 
     if (emailExists) {
-      alert("Email already exists! Please use a different email or login.");
+      showToast("Email already exists! Please use a different email or login.", "error");
       return;
     }
 
@@ -51,6 +51,7 @@ if (signupForm) {
     existingUsers.push(user);
     localStorage.setItem("allUsers", JSON.stringify(existingUsers));
     localStorage.setItem("user", JSON.stringify(user));
+    localStorage.setItem("loggedIn", "true");
 
     // Initialize per-user storage with empty data to prevent stale session leaks
     const userKey = "userdata_" + email.toLowerCase();
@@ -61,7 +62,13 @@ if (signupForm) {
       artistArtworks: []
     }));
 
-    alert("Signup Successful!");
+    // Initialize active session keys with empty arrays
+    localStorage.setItem("cartItems", JSON.stringify([]));
+    localStorage.setItem("wishlist", JSON.stringify([]));
+    localStorage.setItem("myOrders", JSON.stringify([]));
+    localStorage.setItem("artistArtworks", JSON.stringify([]));
+
+    showToast("Signup Successful!");
 
     window.location.href = "login.html";
   });
@@ -92,24 +99,22 @@ if (loginForm) {
       const userKey = "userdata_" + user.email.toLowerCase();
       const savedData = JSON.parse(localStorage.getItem(userKey)) || {};
 
-      if (savedData.cartItems) {
-        localStorage.setItem("cartItems", JSON.stringify(savedData.cartItems));
-      }
-      if (savedData.wishlist) {
-        localStorage.setItem("wishlist", JSON.stringify(savedData.wishlist));
-      }
-      if (savedData.myOrders) {
-        localStorage.setItem("myOrders", JSON.stringify(savedData.myOrders));
-      }
-      if (savedData.artistArtworks) {
-        localStorage.setItem("artistArtworks", JSON.stringify(savedData.artistArtworks));
-      }
+      // Use empty-array fallbacks for missing/corrupted data
+      localStorage.setItem("cartItems", JSON.stringify(savedData.cartItems || []));
+      localStorage.setItem("wishlist", JSON.stringify(savedData.wishlist || []));
+      localStorage.setItem("myOrders", JSON.stringify(savedData.myOrders || []));
+      localStorage.setItem("artistArtworks", JSON.stringify(savedData.artistArtworks || []));
 
-      alert("Login Successful!");
+      // Auto-save user data on tab/browser close
+      window.addEventListener("beforeunload", function () {
+        saveUserData();
+      });
+
+      showToast("Login Successful!");
 
       window.location.href = "../index.html";
     } else {
-      alert("Invalid Email or Password");
+      showToast("Invalid Email or Password", "error");
     }
   });
 }

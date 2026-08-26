@@ -1,3 +1,8 @@
+// Protected page: require login
+if (!requireAuth()) {
+  throw new Error("Not authenticated");
+}
+
 const ordersList = document.getElementById("ordersList");
 
 function getStatusBadge(status) {
@@ -12,7 +17,7 @@ function getStatusBadge(status) {
 }
 
 function renderOrders() {
-  const currentOrders = JSON.parse(localStorage.getItem("myOrders")) || [];
+  const currentOrders = getStorage("myOrders", []);
 
   if (currentOrders.length === 0) {
     ordersList.innerHTML =
@@ -79,17 +84,18 @@ function renderOrders() {
 
 window.cancelOrder = function (index) {
   if (!confirm("Are you sure you want to cancel this order?")) return;
-  const currentOrders = JSON.parse(localStorage.getItem("myOrders")) || [];
+  const currentOrders = getStorage("myOrders", []);
   if (currentOrders[index]) {
     currentOrders[index].status = "Cancelled";
-    localStorage.setItem("myOrders", JSON.stringify(currentOrders));
+    setStorage("myOrders", currentOrders);
+    saveUserData();
     showToast("Order Cancelled ❌", "info");
     renderOrders();
   }
 };
 
 window.trackOrder = function (index) {
-  const currentOrders = JSON.parse(localStorage.getItem("myOrders")) || [];
+  const currentOrders = getStorage("myOrders", []);
   const order = currentOrders[index];
   if (!order) return;
 
@@ -134,9 +140,10 @@ window.trackOrder = function (index) {
 
 window.deleteOrder = function (index) {
   if (!confirm("Delete this order permanently?")) return;
-  let currentOrders = JSON.parse(localStorage.getItem("myOrders")) || [];
+  let currentOrders = getStorage("myOrders", []);
   currentOrders.splice(index, 1);
-  localStorage.setItem("myOrders", JSON.stringify(currentOrders));
+  setStorage("myOrders", currentOrders);
+  saveUserData();
   showToast("Order Deleted 🗑", "info");
   renderOrders();
 };

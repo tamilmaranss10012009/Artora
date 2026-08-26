@@ -1,4 +1,9 @@
-const artworks = JSON.parse(localStorage.getItem("artistArtworks")) || [];
+// Protected page: require login
+if (!requireAuth()) {
+  throw new Error("Not authenticated");
+}
+
+const artworks = getStorage("artistArtworks", []);
 
 const container = document.getElementById("myArtworks");
 
@@ -51,7 +56,8 @@ function deleteArtwork(index) {
   if (confirm("Delete this artwork?")) {
     artworks.splice(index, 1);
 
-    localStorage.setItem("artistArtworks", JSON.stringify(artworks));
+    setStorage("artistArtworks", artworks);
+    saveUserData();
 
     location.reload();
   }

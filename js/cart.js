@@ -1,4 +1,9 @@
-const items = JSON.parse(localStorage.getItem("cartItems")) || [];
+// Protected page: require login
+if (!requireAuth()) {
+  throw new Error("Not authenticated");
+}
+
+const items = getStorage("cartItems", []);
 
 const cartItems = document.getElementById("cartItems");
 
@@ -47,16 +52,17 @@ if (items.length > 0) {
   document.getElementById("grandTotal").innerText = "Grand Total: ₹0";
 }
 function removeItem(index) {
-  let items = JSON.parse(localStorage.getItem("cartItems")) || [];
+  let items = getStorage("cartItems", []);
 
   items.splice(index, 1);
 
-  localStorage.setItem("cartItems", JSON.stringify(items));
+  setStorage("cartItems", items);
+  saveUserData();
 
   location.reload();
 }
 function changeQuantity(index, change) {
-  let items = JSON.parse(localStorage.getItem("cartItems")) || [];
+  let items = getStorage("cartItems", []);
 
   items[index].quantity += change;
 
@@ -64,7 +70,8 @@ function changeQuantity(index, change) {
     items[index].quantity = 1;
   }
 
-  localStorage.setItem("cartItems", JSON.stringify(items));
+  setStorage("cartItems", items);
+  saveUserData();
 
   location.reload();
 }

@@ -1,9 +1,14 @@
+// Protected page: require login
+if (!requireAuth()) {
+  throw new Error("Not authenticated");
+}
+
 const editIndex = localStorage.getItem("editIndex");
 
 const artistForm = document.getElementById("artistForm");
 
 if (editIndex !== null) {
-  const artworks = JSON.parse(localStorage.getItem("artistArtworks")) || [];
+  const artworks = getStorage("artistArtworks", []);
 
   const art = artworks[editIndex];
 
@@ -32,7 +37,7 @@ artistForm.addEventListener("submit", function (event) {
 
   const price = "₹" + priceVal;
 
-  let artworks = JSON.parse(localStorage.getItem("artistArtworks")) || [];
+  let artworks = getStorage("artistArtworks", []);
 
   // Check for duplicate on new upload (not edit)
   if (editIndex === null) {
@@ -45,7 +50,7 @@ artistForm.addEventListener("submit", function (event) {
     }
   }
 
-  const currentUser = JSON.parse(localStorage.getItem("user"));
+  const currentUser = getCurrentUser();
   const artistName = currentUser ? currentUser.name : "Unknown Artist";
 
   const category = document.getElementById("artCategory")?.value || "Painting";
@@ -76,7 +81,8 @@ artistForm.addEventListener("submit", function (event) {
     showToast("Artwork Uploaded Successfully!");
   }
 
-  localStorage.setItem("artistArtworks", JSON.stringify(artworks));
+  setStorage("artistArtworks", artworks);
+  saveUserData();
 
   artistForm.reset();
 

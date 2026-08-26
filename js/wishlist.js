@@ -1,4 +1,9 @@
-const wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+// Protected page: require login
+if (!requireAuth()) {
+  throw new Error("Not authenticated");
+}
+
+const wishlist = getStorage("wishlist", []);
 
 const wishlistItems = document.getElementById("wishlistItems");
 
@@ -26,7 +31,7 @@ if (wishlist.length > 0) {
 
 </div>
 
-                <hr><br>
+            <hr><br>
 
             </div>
         `;
@@ -36,17 +41,18 @@ if (wishlist.length > 0) {
 }
 
 function removeWishlist(index) {
-  let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+  let wishlist = getStorage("wishlist", []);
 
   wishlist.splice(index, 1);
 
-  localStorage.setItem("wishlist", JSON.stringify(wishlist));
+  setStorage("wishlist", wishlist);
+  saveUserData();
 
   location.reload();
 }
 function moveToCart(index) {
-  let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
-  let cart = JSON.parse(localStorage.getItem("cartItems")) || [];
+  let wishlist = getStorage("wishlist", []);
+  let cart = getStorage("cartItems", []);
 
   const item = wishlist[index];
 
@@ -63,8 +69,9 @@ function moveToCart(index) {
 
   wishlist.splice(index, 1);
 
-  localStorage.setItem("cartItems", JSON.stringify(cart));
-  localStorage.setItem("wishlist", JSON.stringify(wishlist));
+  setStorage("cartItems", cart);
+  setStorage("wishlist", wishlist);
+  saveUserData();
 
   location.reload();
 }

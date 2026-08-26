@@ -36,7 +36,7 @@
 <script>
   // Require login before going to checkout
   document.getElementById("checkoutBuyBtn")?.addEventListener("click", function(e) {
-    if (localStorage.getItem("loggedIn") !== "true") {
+    if (!isLoggedIn()) {
       e.preventDefault();
       showToast("Please login to checkout", "warning");
       setTimeout(() => {

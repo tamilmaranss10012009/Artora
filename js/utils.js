@@ -178,6 +178,47 @@ function logoutUser() {
   setTimeout(() => window.location.reload(), 500);
 }
 
+// ---------- Require Auth (protected page guard) ----------
+function requireAuth() {
+  if (!isLoggedIn()) {
+    showToast("Please login to access this page", "warning");
+    setTimeout(() => {
+      const isInPages = window.location.pathname.includes("/pages/");
+      window.location.href = isInPages ? "login.html" : "pages/login.html";
+    }, 1000);
+    return false;
+  }
+  return true;
+}
+
+// ---------- Initialize protected page: guard + restore user data ----------
+function initProtectedPage() {
+  if (!requireAuth()) return;
+
+  // Restore user data from per-user storage into active session keys
+  const key = getUserDataKey();
+  if (key) {
+    const savedData = getStorage(key, {});
+    if (Array.isArray(savedData.cartItems)) {
+      setStorage("cartItems", savedData.cartItems);
+    }
+    if (Array.isArray(savedData.wishlist)) {
+      setStorage("wishlist", savedData.wishlist);
+    }
+    if (Array.isArray(savedData.myOrders)) {
+      setStorage("myOrders", savedData.myOrders);
+    }
+    if (Array.isArray(savedData.artistArtworks)) {
+      setStorage("artistArtworks", savedData.artistArtworks);
+    }
+  }
+
+  // Auto-save user data on tab/browser close
+  window.addEventListener("beforeunload", function () {
+    saveUserData();
+  });
+}
+
 // ---------- Cart Badge Update ----------
 function updateCartBadge() {
   const items = getStorage("cartItems", []);
@@ -319,6 +360,13 @@ function injectFooter() {
 function initPage() {
   injectNavbar();
   injectFooter();
+
+  // Auto-save user data on tab/browser close (for logged-in users)
+  if (isLoggedIn()) {
+    window.addEventListener("beforeunload", function () {
+      saveUserData();
+    });
+  }
 }
 
 // Auto-init when script is loaded (but not on index.html which has its own header)

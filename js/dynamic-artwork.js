@@ -1,4 +1,4 @@
-const artwork = JSON.parse(localStorage.getItem("selectedArtwork"));
+const artwork = getStorage("selectedArtwork");
 
 const details = document.getElementById("artworkDetails");
 
@@ -29,14 +29,15 @@ if (artwork) {
   // ---------- Wishlist ----------
 
   document.getElementById("wishlistBtn").addEventListener("click", function () {
-    let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+    let wishlist = getStorage("wishlist", []);
 
     const exists = wishlist.find((item) => item.title === artwork.title);
 
     if (!exists) {
       wishlist.push(artwork);
 
-      localStorage.setItem("wishlist", JSON.stringify(wishlist));
+      setStorage("wishlist", wishlist);
+      saveUserData();
 
       showToast("Added to Wishlist ❤️");
     } else {
@@ -47,7 +48,7 @@ if (artwork) {
   // ---------- Cart ----------
 
   document.getElementById("addCartBtn").addEventListener("click", function () {
-    let cart = JSON.parse(localStorage.getItem("cartItems")) || [];
+    let cart = getStorage("cartItems", []);
 
     const existing = cart.find((item) => item.title === artwork.title);
 
@@ -62,7 +63,8 @@ if (artwork) {
       });
     }
 
-    localStorage.setItem("cartItems", JSON.stringify(cart));
+    setStorage("cartItems", cart);
+    saveUserData();
 
     showToast("Added to Cart! 🛒");
 
@@ -73,8 +75,7 @@ if (artwork) {
 
   document.getElementById("buyNowBtn").addEventListener("click", function () {
     // Require login before Buy Now
-    const loggedIn = localStorage.getItem("loggedIn") === "true";
-    if (!loggedIn) {
+    if (!isLoggedIn()) {
       showToast("Please login to purchase", "warning");
       setTimeout(() => {
         window.location.href = "login.html";
@@ -82,17 +83,27 @@ if (artwork) {
       return;
     }
 
-    localStorage.setItem(
-      "cartItems",
-      JSON.stringify([
-        {
-          title: artwork.title,
-          price: artwork.price,
-          image: artwork.image,
-          quantity: 1,
-        },
-      ]),
-    );
+    // Save the user's existing cart so it can be restored after checkout
+    const currentCart = getStorage("cartItems", []);
+    setStorage("checkoutSession", {
+      originalCart: currentCart,
+      buyNowItem: {
+        title: artwork.title,
+        price: artwork.price,
+        image: artwork.image,
+        quantity: 1,
+      },
+    });
+
+    // Set cart to just the Buy Now item for checkout
+    setStorage("cartItems", [
+      {
+        title: artwork.title,
+        price: artwork.price,
+        image: artwork.image,
+        quantity: 1,
+      },
+    ]);
 
     window.location.href = "checkout.html";
   });
@@ -112,7 +123,7 @@ const reviewsList = document.getElementById("reviewsList");
 const submitReview = document.getElementById("submitReview");
 
 if (artwork && submitReview && reviewsList) {
-  let reviews = JSON.parse(localStorage.getItem("reviews")) || {};
+  let reviews = getStorage("reviews", {});
 
   if (!reviews[artwork.title]) {
     reviews[artwork.title] = [];
@@ -152,7 +163,7 @@ if (artwork && submitReview && reviewsList) {
       text: text,
     });
 
-    localStorage.setItem("reviews", JSON.stringify(reviews));
+    setStorage("reviews", reviews);
 
     document.getElementById("reviewText").value = "";
 

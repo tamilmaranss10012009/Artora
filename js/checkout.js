@@ -2,22 +2,15 @@
 // Login Check - Require login before checkout
 // ==========================
 
-(function requireLogin() {
-  const loggedIn = localStorage.getItem("loggedIn") === "true";
-  if (!loggedIn) {
-    showToast("Please login to checkout", "warning");
-    setTimeout(() => {
-      window.location.href = "login.html";
-    }, 1000);
-    return;
-  }
-})();
+if (!requireAuth()) {
+  throw new Error("Not authenticated");
+}
 
 // ==========================
 // Order Summary
 // ==========================
 
-const items = JSON.parse(localStorage.getItem("cartItems")) || [];
+const items = getStorage("cartItems", []);
 const summary = document.getElementById("summaryItems");
 let total = 0;
 
@@ -250,7 +243,7 @@ if (form) {
     event.preventDefault();
 
     // Double-check login
-    if (localStorage.getItem("loggedIn") !== "true") {
+    if (!isLoggedIn()) {
       showToast("Please login to place an order", "error");
       setTimeout(() => {
         window.location.href = "login.html";
@@ -276,7 +269,7 @@ if (form) {
     const pincode = document.getElementById("checkoutPincode").value.trim();
     const payment = paymentSelect.value;
 
-    let orders = JSON.parse(localStorage.getItem("myOrders")) || [];
+    let orders = getStorage("myOrders", []);
 
     orders.push({
       orderId: "ORD-" + Date.now().toString(36).toUpperCase(),
@@ -288,8 +281,19 @@ if (form) {
       status: "Processing",
     });
 
-    localStorage.setItem("myOrders", JSON.stringify(orders));
-    localStorage.removeItem("cartItems");
+    setStorage("myOrders", orders);
+
+    // Restore the user's original cart if this was a Buy Now flow
+    const checkoutSession = getStorage("checkoutSession", null);
+    if (checkoutSession && Array.isArray(checkoutSession.originalCart)) {
+      setStorage("cartItems", checkoutSession.originalCart);
+    } else {
+      setStorage("cartItems", []);
+    }
+    removeStorage("checkoutSession");
+
+    // Persist user data after order placement
+    saveUserData();
 
     showToast("Order placed successfully! 🎉");
     setTimeout(() => {

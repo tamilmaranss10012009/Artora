@@ -40,7 +40,7 @@ if (exploreBtn && featuredSection) {
 // ==========================
 
 function updateCartCount() {
-  const items = JSON.parse(localStorage.getItem("cartItems")) || [];
+  const items = getStorage("cartItems", []);
   let totalQty = 0;
   items.forEach((item) => {
     totalQty += item.quantity || 0;
@@ -97,7 +97,7 @@ const artworks = {
 // ==========================
 
 function getArtworkRatingHtml(title) {
-  const reviews = JSON.parse(localStorage.getItem("reviews")) || {};
+  const reviews = getStorage("reviews", {});
   if (reviews[title] && reviews[title].length > 0) {
     const ratings = reviews[title];
     const avg = ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length;
@@ -143,7 +143,7 @@ function renderAllArtworks(filterText = "") {
   }
 
   // Add uploaded artworks
-  const uploaded = JSON.parse(localStorage.getItem("artistArtworks")) || [];
+  const uploaded = getStorage("artistArtworks", []);
   uploaded.forEach(function (art, index) {
     const match =
       !filterText ||
@@ -177,11 +177,12 @@ function renderAllArtworks(filterText = "") {
     button.addEventListener("click", function (event) {
       event.preventDefault();
       const id = this.dataset.id;
-      let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+      let wishlist = getStorage("wishlist", []);
       const exists = wishlist.find((item) => item.title === artworks[id].title);
       if (!exists) {
         wishlist.push(artworks[id]);
-        localStorage.setItem("wishlist", JSON.stringify(wishlist));
+        setStorage("wishlist", wishlist);
+        saveUserData();
         showToast("Added to Wishlist ❤️");
       } else {
         showToast("Already in Wishlist ❤️", "warning");
@@ -203,7 +204,7 @@ function getArtworkLookup() {
   for (const id in artworks) {
     map[artworks[id].title.toLowerCase()] = { id: id, type: "default" };
   }
-  const uploaded = JSON.parse(localStorage.getItem("artistArtworks")) || [];
+  const uploaded = getStorage("artistArtworks", []);
   uploaded.forEach((art, index) => {
     if (art.title) {
       map[art.title.toLowerCase()] = { index: index, type: "uploaded" };
@@ -268,7 +269,7 @@ if (searchBtn && searchInput) {
 
 function renderUserSection() {
   const userSection = document.getElementById("userSection");
-  const currentUser = JSON.parse(localStorage.getItem("user"));
+  const currentUser = getCurrentUser();
   const isLoggedIn = localStorage.getItem("loggedIn") === "true";
 
   if (!userSection) return;
@@ -320,6 +321,12 @@ function updateProtectedNavLinks() {
 renderUserSection();
 updateProtectedNavLinks();
 
+// Auto-save user data on tab/browser close (for logged-in users on index.html)
+if (isLoggedIn()) {
+  window.addEventListener("beforeunload", function () {
+    saveUserData();
+  });
+}
 
 // ==========================
 // Category Filter (shows matching cards in grid)
@@ -348,18 +355,18 @@ function openDefaultArtwork(id) {
 }
 
 function openDynamicArtwork(index) {
-  const artistArtworks = JSON.parse(localStorage.getItem("artistArtworks")) || [];
+  const artistArtworks = getStorage("artistArtworks", []);
   if (!artistArtworks[index]) return;
   localStorage.setItem("selectedArtwork", JSON.stringify(artistArtworks[index]));
   window.location.href = "pages/dynamic-artwork.html";
 }
 
 function addDynamicWishlist(index) {
-  const artistArtworks = JSON.parse(localStorage.getItem("artistArtworks")) || [];
+  const artistArtworks = getStorage("artistArtworks", []);
   const artwork = artistArtworks[index];
   if (!artwork) return;
 
-  let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+  let wishlist = getStorage("wishlist", []);
   const exists = wishlist.find((item) => item.title === artwork.title);
 
   if (exists) {
@@ -368,7 +375,8 @@ function addDynamicWishlist(index) {
   }
 
   wishlist.push(artwork);
-  localStorage.setItem("wishlist", JSON.stringify(wishlist));
+  setStorage("wishlist", wishlist);
+  saveUserData();
   showToast("Added to Wishlist ❤️");
 }
 
