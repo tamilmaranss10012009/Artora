@@ -1,0 +1,20 @@
+{
+  "name": "artora-server",
+  "version": "0.1.0",
+  "description": "Phase A backend foundation for Artora (auth + sessions + health).",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node app.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "argon2": "^0.41.1",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "pg": "^8.12.2"
+  }
+}

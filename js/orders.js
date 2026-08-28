@@ -51,7 +51,7 @@ function renderOrders() {
       html += `
         <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; flex-wrap:wrap; gap:10px;">
           <div>
-            <strong>${item.title}</strong>
+            <strong>${escapeHtml(item.title)}</strong>
             <span style="color:#888; font-size:14px;"> × ${item.quantity}</span>
           </div>
           <span style="font-weight:bold;">₹${(price * item.quantity).toLocaleString("en-IN")}</span>

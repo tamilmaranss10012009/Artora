@@ -21,7 +21,7 @@ if (items.length > 0) {
     total += price * item.quantity;
     summary.innerHTML += `
       <div class="checkout-item">
-        <span><strong>${item.title}</strong> × ${item.quantity}</span>
+        <span><strong>${escapeHtml(item.title)}</strong> × ${item.quantity}</span>
         <span>₹${(price * item.quantity).toLocaleString("en-IN")}</span>
       </div>
     `;
@@ -238,9 +238,17 @@ if (pincodeInput) {
 
 const form = document.getElementById("checkoutForm");
 
+// P1-C: double-submit protection. Guards the one-time order placement path so
+// rapid clicks / double-clicks / Enter-key repeats cannot create duplicate
+// orders. This is a UX guard, NOT a security boundary — server-side
+// idempotency remains the authoritative control (Phase F / checkout integrity).
+let submitting = false;
+
 if (form) {
   form.addEventListener("submit", function (event) {
     event.preventDefault();
+
+    if (submitting) return; // block duplicate submission while one is in flight
 
     // Double-check login
     if (!isLoggedIn()) {
@@ -258,8 +266,12 @@ if (form) {
 
     if (!validateCheckout()) {
       showToast("Please fix the highlighted errors", "error");
+      // validation failed -> allow the user to correct and re-submit
+      submitting = false;
       return;
     }
+
+    submitting = true; // lock submission for the in-flight order
 
     const name = document.getElementById("checkoutName").value.trim();
     const phone = document.getElementById("checkoutPhone").value.trim();

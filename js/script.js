@@ -156,10 +156,10 @@ function renderAllArtworks(filterText = "") {
     const ratingHtml = getArtworkRatingHtml(art.title);
     html += `
       <div class="art-card">
-        <img src="${art.image}" alt="${art.title}">
-        <h3>${art.title}</h3>
+        <img src="${escapeHtml(art.image)}" alt="${escapeHtml(art.title)}">
+        <h3>${escapeHtml(art.title)}</h3>
         ${ratingHtml}
-        <p>${art.price}</p>
+        <p>${escapeHtml(art.price)}</p>
         <button onclick="addDynamicWishlist(${index})">❤️ Wishlist</button>
         <button onclick="openDynamicArtwork(${index})">View Details</button>
       </div>
@@ -167,7 +167,7 @@ function renderAllArtworks(filterText = "") {
   });
 
   if (html === "") {
-    html = `<p style="grid-column:1/-1;text-align:center;padding:40px;font-size:18px;color:var(--text-color);">No artworks found${filterText ? ' matching "' + filterText + '"' : ''}.</p>`;
+    html = `<p style="grid-column:1/-1;text-align:center;padding:40px;font-size:18px;color:var(--text-color);">No artworks found${filterText ? ' matching "' + escapeHtml(filterText) + '"' : ''}.</p>`;
   }
 
   artGrid.innerHTML = html;
@@ -270,13 +270,13 @@ if (searchBtn && searchInput) {
 function renderUserSection() {
   const userSection = document.getElementById("userSection");
   const currentUser = getCurrentUser();
-  const isLoggedIn = localStorage.getItem("loggedIn") === "true";
+  const loggedIn = isLoggedIn();
 
   if (!userSection) return;
 
-  if (isLoggedIn && currentUser) {
+  if (loggedIn && currentUser) {
     userSection.innerHTML = `
-      👋 ${currentUser.name}
+      👋 ${escapeHtml(currentUser.name)}
       <button id="logoutBtn">Logout</button>
     `;
 
@@ -290,7 +290,7 @@ function renderUserSection() {
 
 // Conditionally show/hide protected nav links on index.html
 function updateProtectedNavLinks() {
-  const isLoggedIn = localStorage.getItem("loggedIn") === "true";
+  const loggedIn = isLoggedIn();
   const nav = document.querySelector("header nav");
   if (!nav) return;
 
@@ -298,7 +298,7 @@ function updateProtectedNavLinks() {
   const existingLinks = nav.querySelectorAll(".protected-nav-link");
   existingLinks.forEach(el => el.remove());
 
-  if (isLoggedIn) {
+  if (loggedIn) {
     // Add cart, wishlist, orders, my-artworks after the Artists link
     const artistsLink = nav.querySelector('a[href="#artists"]');
     if (artistsLink) {
@@ -318,15 +318,23 @@ function updateProtectedNavLinks() {
   updateCartCount();
 }
 
-renderUserSection();
-updateProtectedNavLinks();
+// Phase B bootstrap: reconcile identity with the backend BEFORE rendering
+// auth-sensitive UI (navbar user section + protected nav links). The session
+// rides on the HttpOnly cookie; localStorage is only a non-authoritative cache.
+// We do not block the page render — if the backend is unreachable, the cache
+// (if previously verified) still renders, otherwise the page shows the
+// unauthenticated state (fail closed).
+bootstrapAuth().then(function () {
+  renderUserSection();
+  updateProtectedNavLinks();
 
-// Auto-save user data on tab/browser close (for logged-in users on index.html)
-if (isLoggedIn()) {
-  window.addEventListener("beforeunload", function () {
-    saveUserData();
-  });
-}
+  // Auto-save user data on tab/browser close (for logged-in users on index.html)
+  if (isLoggedIn()) {
+    window.addEventListener("beforeunload", function () {
+      saveUserData();
+    });
+  }
+});
 
 // ==========================
 // Category Filter (shows matching cards in grid)

@@ -15,11 +15,11 @@ if (artworks.length === 0) {
     container.innerHTML += `
             <div class="art-card">
 
-                <img src="${imgPath}" width="200">
+                <img src="${escapeHtml(imgPath)}" width="200">
 
-                <h3>${art.title}</h3>
+                <h3>${escapeHtml(art.title)}</h3>
 
-                <p>${art.price}</p>
+                <p>${escapeHtml(art.price)}</p>
 
                 <button onclick="viewArtwork(${index})">
                     👁 View

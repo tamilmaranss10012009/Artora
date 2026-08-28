@@ -15,11 +15,11 @@ if (wishlist.length > 0) {
     wishlistItems.innerHTML += `
             <div class="cart-item">
 
-                <img src="${imgPath}" class="cart-image">
+                <img src="${escapeHtml(imgPath)}" class="cart-image">
 
-                <h2>${item.title}</h2>
+                <h2>${escapeHtml(item.title)}</h2>
 
-                <h3>${item.price}</h3>
+                <h3>${escapeHtml(item.price)}</h3>
 
     <button onclick="moveToCart(${index})">
         Move to Cart

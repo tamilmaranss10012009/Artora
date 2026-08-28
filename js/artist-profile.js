@@ -9,8 +9,8 @@ const profile = document.getElementById("artistProfile");
 
 if (user) {
   profile.innerHTML = `
-<h2>${user.name}</h2>
-<p>${user.email}</p>
+<h2>${escapeHtml(user.name)}</h2>
+<p>${escapeHtml(user.email)}</p>
 `;
 } else {
   profile.innerHTML = "<h2>User not found</h2>";
@@ -30,11 +30,11 @@ if (artworks.length === 0) {
     html += `
 <div class="art-card">
 
-<img src="${imgPath}" alt="${art.title}" class="art-image">
+<img src="${escapeHtml(imgPath)}" alt="${escapeHtml(art.title)}" class="art-image">
 
-<h3>${art.title}</h3>
+<h3>${escapeHtml(art.title)}</h3>
 
-<p>${art.price}</p>
+<p>${escapeHtml(art.price)}</p>
 
 <button onclick="viewArtwork(${index})">
 View Details

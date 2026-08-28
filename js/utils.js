@@ -87,6 +87,15 @@ function normalizeImagePath(path) {
   return "../" + path;
 }
 
+// ---------- HTML Escaping ----------
+// Render user-controlled values as text and prevent attribute breakouts. Used at every
+// DOM sink where user-authored data is interpolated into template HTML (AUD-004).
+function escapeHtml(value) {
+  return String(value == null ? "" : value).replace(/[&<>"']/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+  });
+}
+
 // ---------- LocalStorage Helpers ----------
 function getStorage(key, defaultValue = null) {
   try {
@@ -126,11 +135,22 @@ function parsePrice(price) {
 }
 
 // ---------- Auth Helpers ----------
+// Phase B: authentication is backend-authoritative. The server session (HttpOnly
+// cookie) is the ONLY proof of login. localStorage.user / loggedIn are retained
+// ONLY as a non-authoritative UI cache so the legacy demo still renders when the
+// backend is offline. They may NEVER grant access by themselves — verifyAuth()
+// reconciles the cache against the server and clears it on any server failure.
+const _auth = { verified: false, user: null, checked: false };
+
 function isLoggedIn() {
-  return localStorage.getItem("loggedIn") === "true";
+  // Cache is only trusted if this session has been verified against the backend.
+  // Unverified cache (e.g. server unreachable) => unauthenticated (fail closed).
+  if (!_auth.checked) return getStorage("loggedIn", "") === "true" || false;
+  return _auth.verified && !!_auth.user;
 }
 
 function getCurrentUser() {
+  if (_auth.verified) return _auth.user;
   return getStorage("user");
 }
 
@@ -141,13 +161,73 @@ function getUserDataKey() {
   return "userdata_" + user.email.toLowerCase();
 }
 
+// Reconcile the localStorage UI cache with the backend session.
+// Fail-closed: any server error/401/network failure => unauthenticated cache.
+// Called once per page load (bootstrapAuth) and after every auth-affecting
+// action (login/logout).
+function verifyAuthState(user) {
+  _auth.checked = true;
+  _auth.verified = !!user;
+  _auth.user = user || null;
+  if (!user) {
+    // Backend says not authenticated — clear the legacy cache so it can never
+    // grant access on its own.
+    localStorage.removeItem("loggedIn");
+    localStorage.removeItem("user");
+  } else {
+    // Mirror a safe UI-only cache (NOT an authority).
+    localStorage.setItem("user", JSON.stringify(user));
+    localStorage.setItem("loggedIn", "true");
+  }
+  return !!user;
+}
+
+// Ask the backend whether a session is active. Returns null on any failure
+// (401 / 403 / 5xx / network error) so callers fail closed.
+async function checkAuthSession() {
+  try {
+    const res = await apiFetch("/me");
+    if (res.ok && res.body && res.body.user) return res.body.user;
+  } catch (e) { /* noop — fail closed */ }
+  return null;
+}
+
+// Phase B bootstrap: reconcile identity with the backend before any auth-
+// dependent code runs. Must be awaited by pages that gate on login.
+async function bootstrapAuth() {
+  if (_auth.checked) return _auth.user;
+  const user = await checkAuthSession();
+  verifyAuthState(user);
+  return user;
+}
+
+// ---------- Buy Now checkout-session safety (AUD-001) ----------
+// While a temporary Buy Now checkout is active, the session "cartItems" holds ONLY the
+// Buy Now item and "checkoutSession.originalCart" holds the user's real cart. The
+// temporary cart must never overwrite the user's last-good persisted cart, and an
+// abandoned checkout must restore that cart instead of leaking a stale session.
+function isBuyNowCheckoutActive() {
+  try {
+    return !!localStorage.getItem("checkoutSession");
+  } catch (e) {
+    return false;
+  }
+}
+
 // ---------- Save current user data to per-user storage ----------
 function saveUserData() {
   const key = getUserDataKey();
   if (!key) return;
 
+  // AUD-001: while a temporary Buy Now checkout is active, the session "cartItems"
+  // contains only the Buy Now item, so carry the last-good persisted cart forward
+  // untouched instead of overwriting it. Wishlist/orders/artworks save as usual.
+  const buyNowActive = isBuyNowCheckoutActive();
+  const previous = buyNowActive ? getStorage(key, {}) : null;
+  const previousCart = (previous && previous.cartItems !== undefined) ? previous.cartItems : [];
+
   const userData = {
-    cartItems: getStorage("cartItems", []),
+    cartItems: buyNowActive ? previousCart : getStorage("cartItems", []),
     wishlist: getStorage("wishlist", []),
     myOrders: getStorage("myOrders", []),
     artistArtworks: getStorage("artistArtworks", []),
@@ -156,14 +236,36 @@ function saveUserData() {
   localStorage.setItem(key, JSON.stringify(userData));
 }
 
-// ---------- Logout: save user data, then clear only active session ----------
-function logoutUser() {
-  // Save current user's data before clearing
-  saveUserData();
+// ---------- Abandoned Buy Now checkout restore (AUD-001) ----------
+// If a Buy Now checkout was left without placing the order, "checkoutSession" lingers in
+// localStorage while the session "cartItems" still holds only the Buy Now item. On any
+// later page (any page EXCEPT checkout.html itself — refreshing there must keep the Buy
+// Now checkout intact) restore the original cart, drop the abandoned session, persist.
+function restoreAbandonedBuyNow() {
+  if (!isBuyNowCheckoutActive()) return false;
+  if (window.location.pathname.indexOf("checkout.html") !== -1) return false;
 
-  // Clear only the active session (not permanent data)
-  localStorage.removeItem("loggedIn");
-  localStorage.removeItem("user");
+  const session = getStorage("checkoutSession", null);
+  if (!session || !Array.isArray(session.originalCart)) {
+    // Malformed leftover session — nothing restorable; just clean it up.
+    localStorage.removeItem("checkoutSession");
+    return true;
+  }
+
+  setStorage("cartItems", session.originalCart);
+  localStorage.removeItem("checkoutSession");
+  saveUserData(); // session is gone now, so this persists the restored original cart
+  updateCartBadge();
+  return true;
+}
+
+// ---------- Logout: invalidate server session + clear local state ----------
+async function logoutUser() {
+  try { await apiFetch("/logout", { method: "POST" }); } catch (e) { /* noop */ }
+  // Save user data before clearing the active session
+  saveUserData();
+  // Invalidate the authoritative cache AND clear the legacy UI cache
+  verifyAuthState(null);
   localStorage.removeItem("cartItems");
   localStorage.removeItem("wishlist");
   localStorage.removeItem("myOrders");
@@ -173,22 +275,31 @@ function logoutUser() {
   localStorage.removeItem("editIndex");
 
   showToast("Logged out successfully");
-
-  // Reload page or refresh UI
   setTimeout(() => window.location.reload(), 500);
 }
 
 // ---------- Require Auth (protected page guard) ----------
-function requireAuth() {
-  if (!isLoggedIn()) {
-    showToast("Please login to access this page", "warning");
-    setTimeout(() => {
-      const isInPages = window.location.pathname.includes("/pages/");
-      window.location.href = isInPages ? "login.html" : "pages/login.html";
-    }, 1000);
-    return false;
+// Phase B: fail-closed. Uses the backend-verified cache. If the cache has not
+// yet been verified at startup, it falls back to a one-shot verification
+// against GET /api/auth/me before deciding. Async so it can fail-closed on a
+// pending server call without ever trusting an unverified localStorage value.
+async function requireAuth() {
+  if (typeof _auth !== "undefined" && _auth.checked) {
+    if (!_auth.verified) { redirectToLogin(); return false; }
+    return true;
   }
-  return true;
+  const user = await checkAuthSession();
+  if (verifyAuthState(user)) return true;
+  redirectToLogin();
+  return false;
+}
+
+function redirectToLogin() {
+  showToast("Please login to access this page", "warning");
+  setTimeout(() => {
+    const isInPages = window.location.pathname.includes("/pages/");
+    window.location.href = isInPages ? "login.html" : "pages/login.html";
+  }, 1000);
 }
 
 // ---------- Initialize protected page: guard + restore user data ----------
@@ -269,7 +380,7 @@ function injectNavbar() {
       <span id="userSection">
         ${
           loggedIn && user
-            ? `👋 ${user.name} <button id="logoutBtn" class="nav-logout-btn">Logout</button>`
+            ? `👋 ${escapeHtml(user.name)} <button id="logoutBtn" class="nav-logout-btn">Logout</button>`
             : `<a href="${toPages}login.html">👤 Login</a>`
         }
       </span>
@@ -368,6 +479,16 @@ function initPage() {
     });
   }
 }
+
+// AUD-001: before any page script renders, restore an abandoned Buy Now checkout state
+// on every page EXCEPT the checkout page itself (a refresh there must keep the Buy Now
+// checkout intact and leave "checkoutSession" in place until the order is placed).
+restoreAbandonedBuyNow();
+// bfcache Back/Forward restores do not re-run page scripts; this listener covers them
+// (e.g., pressing Back from an abandoned Buy Now checkout to a cached artwork page).
+window.addEventListener("pageshow", function () {
+  restoreAbandonedBuyNow();
+});
 
 // Auto-init when script is loaded (but not on index.html which has its own header)
 if (!window.location.pathname.endsWith("index.html") && !window.location.pathname.endsWith("/")) {

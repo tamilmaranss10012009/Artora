@@ -19,11 +19,11 @@ if (items.length > 0) {
     cartItems.innerHTML += `
         <div class="cart-item">
 
-            <img src="${imgPath}" class="cart-image">
+            <img src="${escapeHtml(imgPath)}" class="cart-image">
 
-            <h2>${item.title}</h2>
+            <h2>${escapeHtml(item.title)}</h2>
 
-<h3>${item.price}</h3>
+<h3>${escapeHtml(item.price)}</h3>
 
 <div class="quantity-box">
     <button onclick="changeQuantity(${index}, -1)">−</button>

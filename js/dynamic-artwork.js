@@ -5,17 +5,17 @@ const details = document.getElementById("artworkDetails");
 if (artwork) {
   const imgPath = normalizeImagePath(artwork.image);
   details.innerHTML = `
-        <img src="${imgPath}" class="cart-image">
+        <img src="${escapeHtml(imgPath)}" class="cart-image">
 
-        <h1>${artwork.title}</h1>
+        <h1>${escapeHtml(artwork.title)}</h1>
 
-        <h2>${artwork.price}</h2>
+        <h2>${escapeHtml(artwork.price)}</h2>
 
-        <p>${artwork.desc || artwork.description || ""}</p>
+        <p>${escapeHtml(artwork.desc || artwork.description || "")}</p>
 
-        <p><strong>Artist:</strong> ${artwork.artist || "Unknown Artist"}</p>
+        <p><strong>Artist:</strong> ${escapeHtml(artwork.artist || "Unknown Artist")}</p>
 
-        <p><strong>Category:</strong> ${artwork.category || "Painting"}</p>
+        <p><strong>Category:</strong> ${escapeHtml(artwork.category || "Painting")}</p>
 
         <br>
 
@@ -133,12 +133,16 @@ if (artwork && submitReview && reviewsList) {
     reviewsList.innerHTML = "";
 
     reviews[artwork.title].forEach(function (review) {
+      // Rating is clamped to a sane range so crafted/corrupt stored values cannot
+      // throw from String.repeat() or cause a memory blowup; stars are generated
+      // (never user text), and review text is rendered as literal text.
+      const starCount = Math.max(0, Math.min(5, Math.round(Number(review.rating)) || 0));
       reviewsList.innerHTML += `
                 <div class="art-card">
 
-                    <h3>${"⭐".repeat(review.rating)}</h3>
+                    <h3>${"⭐".repeat(starCount)}</h3>
 
-                    <p>${review.text}</p>
+                    <p>${escapeHtml(review.text)}</p>
 
                 </div>
             `;
